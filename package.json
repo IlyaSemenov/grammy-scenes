@@ -1,0 +1,63 @@
+{
+  "name": "grammy-scenes",
+  "description": "Nested named scenes for grammY",
+  "version": "0.0.0-development",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IlyaSemenov/grammy-scenes"
+  },
+  "author": "Ilya Semenov",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "tap 'src/**/*.test.ts'",
+    "build": "rollup -c",
+    "prepack": "yarn build",
+    "lint": "eslint --fix '**/*.{js,ts}'",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "*.{js,ts}": "eslint --fix"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^15.0.0",
+    "@commitlint/config-conventional": "^15.0.0",
+    "@types/tap": "^15.0.5",
+    "@types/uuid": "^8.3.3",
+    "@typescript-eslint/eslint-plugin": "^5.8.0",
+    "@typescript-eslint/parser": "^5.8.0",
+    "esbuild": "^0.14.8",
+    "esbuild-runner": "^2.2.1",
+    "eslint": "^8.5.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "grammy": "^1.5.4",
+    "husky": ">=6",
+    "lint-staged": ">=10",
+    "prettier": "^2.1.2",
+    "rollup": "^2.33.1",
+    "rollup-plugin-cleaner": "^1.0.0",
+    "rollup-plugin-dts": "^4.1.0",
+    "rollup-plugin-esbuild": "^4.7.2",
+    "tap": "^15.1.5",
+    "tsconfig-paths": "^3.9.0",
+    "typescript": "^4.0.5"
+  },
+  "peerDependencies": {
+    "grammy": "^1.5.4"
+  },
+  "dependencies": {
+    "ts-essentials": "^9.1.0",
+    "uuid": "^8.3.2"
+  }
+}
