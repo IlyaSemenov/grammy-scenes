@@ -3,6 +3,4 @@ node-arg:
   [
     "-r",
     "esbuild-runner/register",
-    "-r",
-    "tsconfig-paths/register",
   ]

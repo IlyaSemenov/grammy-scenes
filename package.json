@@ -9,23 +9,25 @@
   "author": "Ilya Semenov",
   "license": "MIT",
   "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "source": "src/index.ts",
   "files": [
-    "dist"
+    "dist",
+    "src",
+    "!**/*.test.*"
   ],
   "scripts": {
-    "test": "tap 'src/**/*.test.ts'",
-    "build": "rollup -c",
-    "prepack": "yarn build",
+    "test": "tap 'tests/**/*.test.ts'",
+    "build": "tsup",
+    "prepack": "npm run build",
     "lint": "eslint --fix '**/*.{js,ts}'",
     "prepare": "husky install"
-  },
-  "lint-staged": {
-    "*.{js,ts}": "eslint --fix"
   },
   "devDependencies": {
     "@commitlint/cli": "^15.0.0",
     "@commitlint/config-conventional": "^15.0.0",
+    "@tsconfig/node14": "^1.0.1",
     "@types/tap": "^15.0.5",
     "@types/uuid": "^8.3.3",
     "@typescript-eslint/eslint-plugin": "^5.8.0",
@@ -40,12 +42,8 @@
     "husky": ">=6",
     "lint-staged": ">=10",
     "prettier": "^2.1.2",
-    "rollup": "^2.33.1",
-    "rollup-plugin-cleaner": "^1.0.0",
-    "rollup-plugin-dts": "^4.1.0",
-    "rollup-plugin-esbuild": "^4.7.2",
     "tap": "^15.1.5",
-    "tsconfig-paths": "^3.9.0",
+    "tsup": "^5.11.9",
     "typescript": "^4.0.5"
   },
   "peerDependencies": {
