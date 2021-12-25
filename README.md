@@ -150,21 +150,44 @@ router.use_scene("name").use(/* ... */)
 
 ### Entering scenes
 
-To enter a top-level scene, use:
+To enter a top-level scene, use `ctx.scenes.enter(...)`, optionally passing a single argument:
 
 ```ts
 await ctx.scenes.enter("scene_name")
-```
-
-if the scene has a `enter` handler, it will be called.
-
-Optionally, you may pass a single argument:
-
-```ts
+// or
 await ctx.scenes.enter("scene_name", { item_id: 123 })
 ```
 
-### Continuing scenes
+if the scene has `enter` handler, it will be immediatelly called:
+
+```ts
+scene.enter(async (ctx, arg) => {
+	// will be called on ctx.scenes.enter(...)
+	// arg will be { item_id: 123 }
+})
+```
+
+### Moving through scenes
+
+To proceed to a sibling scene:
+
+```ts
+await ctx.scenes.move("sibling_scene")
+// or
+await ctx.scenes.move("sibling_scene", { item_id: 123 })
+```
+
+To enter a nested sub-scene:
+
+```ts
+await ctx.scenes.inner("subscene")
+// or
+await ctx.scenes.move("sibling_scene", { item_id: 123 })
+```
+
+Similarly, `enter` handlers for subscenes will be called if configured.
+
+### "Continuing" scenes
 
 `grammy-scenes` allows to "continue" a scene on an external event.
 
@@ -192,7 +215,7 @@ add_item_scene.scene("saving", (scene) => {
 		// If user messages us, report that we are busy.
 		await ctx.reply(`Still saving...`)
 	})
-	scene.continue(async (ctx) => {
+	scene.continue(async (ctx, arg) => {
 		// See below when this is called.
 		await ctx.scene.move("complete")
 	})
@@ -207,11 +230,7 @@ To "continue" in an external handler, use:
 
 ```ts
 await ctx.scenes.continue(token)
-```
-
-or
-
-```ts
+// or
 await ctx.scenes.continue(token, { result: 123 })
 ```
 
