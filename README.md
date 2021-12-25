@@ -79,7 +79,7 @@ export const add_item_scene = new Scene<
 				item_price?: number
 			}
 		}>
->("add_bot")
+>("add_item")
 
 // "Enter" handler will be called once when a scene is entered.
 add_item_scene.enter(async (ctx) => {
@@ -115,7 +115,7 @@ add_item_scene.scene("enter_price", (scene) => {
 	})
 })
 
-add_bot_scene.scene("complete").enter(async (ctx) => {
+add_item_scene.scene("complete").enter(async (ctx) => {
 	// Work with session data.
 	await ItemModel.query().insert(ctx.session.add_item)
 	await ctx.reply(`Item saved!`)
@@ -198,7 +198,7 @@ add_item_scene.scene("saving", (scene) => {
 	})
 })
 
-add_bot_scene.scene("complete").enter(async (ctx) => {
+add_item_scene.scene("complete").enter(async (ctx) => {
 	await ctx.reply(`Item saved!`)
 })
 ```
