@@ -26,26 +26,26 @@ type SessionData = SceneSessionFlavor & {
 
 export type MyBotContext = Context & SessionFlavor<SessionData> & ScenesFlavor
 
-const tg_bot = new TgBot<MyBotContext>(process.env.BOT_TOKEN)
+const bot = new Bot<MyBotContext>(process.env.BOT_TOKEN)
 
-tg_bot.use(
+bot.use(
 	session({
 		initial: () => ({}),
 	})
 )
 
 // Inject ctx.scenes
-tg_bot.use(scenes_control_middleware(scenes))
+bot.use(scenes_control_middleware(scenes))
 
-tg_bot.command("start", async (ctx) => {
+bot.command("start", async (ctx) => {
 	await ctx.reply(`Welcome here`)
 	await ctx.scenes.enter("add_item")
 })
 
 // Actually run scenes
-tg_bot.use(scenes)
+bot.use(scenes)
 
-tg_bot.start()
+bot.start()
 ```
 
 ### Scenes
