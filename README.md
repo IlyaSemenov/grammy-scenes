@@ -191,7 +191,9 @@ Similarly, `enter` handlers for subscenes will be called if configured.
 
 `grammy-scenes` allows to "continue" a scene on an external event.
 
-In the scenario above, let's say item data is processed by some kind of external library/remove API/whatever. That's how one will achieve that:
+In the scenario above, let's say item data is processed by some kind of external library/remote API/whatever.
+During that time, user can continue working with the bot (even move away from the scene, e.g. by using a global /command).
+That's how one can setup that workflow:
 
 ```ts
 add_item_scene.scene("enter_price", (scene) => {
