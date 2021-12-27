@@ -12,6 +12,23 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    },
+    "./pseudo-update": {
+      "require": "./dist/contrib/pseudo-update.js",
+      "import": "./dist/contrib/pseudo-update.mjs"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "pseudo-update": [
+        "dist/contrib/pseudo-update"
+      ]
+    }
+  },
   "files": [
     "dist",
     "src",
@@ -23,6 +40,19 @@
     "prepack": "npm run build",
     "lint": "eslint --fix '**/*.{js,ts}'",
     "prepare": "husky install"
+  },
+  "dependencies": {
+    "ts-essentials": "^9.1.0",
+    "uuid": "^8.3.2"
+  },
+  "peerDependencies": {
+    "grammy": "^1.5.4",
+    "grammy-pseudo-update": "^1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "grammy-pseudo-update": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@commitlint/cli": "^15.0.0",
@@ -39,18 +69,12 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "grammy": "^1.5.4",
+    "grammy-pseudo-update": "^1.0.0",
     "husky": ">=6",
     "lint-staged": ">=10",
     "prettier": "^2.1.2",
     "tap": "^15.1.5",
     "tsup": "^5.11.9",
     "typescript": "^4.0.5"
-  },
-  "peerDependencies": {
-    "grammy": "^1.5.4"
-  },
-  "dependencies": {
-    "ts-essentials": "^9.1.0",
-    "uuid": "^8.3.2"
   }
 }

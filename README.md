@@ -237,3 +237,42 @@ await ctx.scenes.continue(token, { result: 123 })
 ```
 
 If the scene has moved on, this will be silently ignored.
+
+### Integration with `grammy-pseudo-update`
+
+In the "continue" example above, the imaginary external handler is supposed to somehow keep a reference to `ctx`.
+
+In real world, that is not always possible. The continuation request could come from e.g. message queue processor or a HTTP server.
+
+To achieve that, `grammy-scenes` provides integration with [grammy-pseudo-update](https://github.com/IlyaSemenov/grammy-pseudo-update):
+
+```ts
+import { scenesPseudoUpdate } from "grammy-scenes/pseudo-update"
+
+// ...
+
+bot.use(scenes)
+bot.use(scenesPseudoUpdate)
+
+on_external_event(({ chat_id, token, arg }) => {
+	bot.handlePseudoUpdate({
+		chat_id,
+		payload: {
+			scenes: { _: "continue", token, arg },
+		},
+	})
+})
+
+bot.start()
+```
+
+Similarly, it's possible to "enter" a scene with:
+
+```ts
+bot.handlePseudoUpdate({
+	chat_id,
+	payload: {
+		scenes: { _: "enter", scene, arg },
+	},
+})
+```

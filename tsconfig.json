@@ -3,7 +3,8 @@
 	"include": ["src", "tests"],
 	"compilerOptions": {
 		"paths": {
-			"grammy-scenes": ["./src"]
+			"grammy-scenes": ["./src"],
+			"grammy-scenes/pseudo-update": ["./src/contrib/pseudo-update"]
 		}
 	}
 }
