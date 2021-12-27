@@ -9,7 +9,7 @@ import { ScenesFlavoredContext } from "./types"
 export class SceneRouter<C extends ScenesFlavoredContext> extends Composer<C> {
 	_scenes: Record<string, Scene<any>> = {}
 
-	use_scene<C2 extends C>(scene: Scene<C2>) {
+	useScene<C2 extends C>(scene: Scene<C2>) {
 		this._scenes[scene.name] = scene
 	}
 

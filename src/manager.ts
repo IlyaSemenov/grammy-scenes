@@ -53,7 +53,7 @@ export class ScenesManager {
 		return scene
 	}
 
-	create_continue_token() {
+	createContinueToken() {
 		const current_scene = this._ctx.session._scene
 		assert(current_scene, `No active scene.`)
 		current_scene.continue_token = uuid_v4()

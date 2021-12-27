@@ -55,7 +55,7 @@ import { MyBotContext } from "../bot"
 import { add_item_scene } from "./add_item"
 
 export const scenes = new SceneRouter<MyBotContext>()
-scenes.use_scene(add_item_scene)
+scenes.useScene(add_item_scene)
 // Other scenes added similarly
 ```
 
@@ -127,13 +127,13 @@ To setup a scene, either simply setup a `Scene` object:
 ```ts
 const scene = new Scene("name")
 scene.use(/* ... */)
-router.use_scene(scene)
+router.useScene(scene)
 ```
 
 or use setup callback:
 
 ```ts
-router.use_scene("name", (scene) => {
+router.useScene("name", (scene) => {
 	scene.use(/* ... */)
 })
 ```
@@ -141,7 +141,7 @@ router.use_scene("name", (scene) => {
 or a shortcut:
 
 ```ts
-router.use_scene("name").use(/* ... */)
+router.useScene("name").use(/* ... */)
 ```
 
 ### Entering scenes
@@ -204,9 +204,9 @@ add_item_scene.scene("saving", (scene) => {
 	scene.enter(async (ctx) => {
 		await ctx.reply(`Saving...`)
 		// Run some kind of long job.
-		process_item_data({
+		processItemData({
 			data: ctx.session.add_item,
-			token: ctx.scenes.create_continue_token(),
+			token: ctx.scenes.createContinueToken(),
 		})
 	})
 	scene.on("message:text", async (ctx) => {
@@ -250,7 +250,7 @@ import { scenesPseudoUpdate } from "grammy-scenes/pseudo-update"
 bot.use(scenes)
 bot.use(scenesPseudoUpdate)
 
-on_external_event(({ chat_id, token, arg }) => {
+onSomeExternalEvent(({ chat_id, token, arg }) => {
 	bot.handlePseudoUpdate({
 		chat_id,
 		payload: {
