@@ -55,7 +55,7 @@ import { MyBotContext } from "../bot"
 import { add_item_scene } from "./add_item"
 
 export const scenes = new SceneRouter<MyBotContext>()
-scenes.useScene(add_item_scene)
+scenes.scene(add_item_scene)
 // Other scenes added similarly
 ```
 
@@ -127,13 +127,13 @@ To setup a scene, either simply setup a `Scene` object:
 ```ts
 const scene = new Scene("name")
 scene.use(/* ... */)
-router.useScene(scene)
+router.scene(scene)
 ```
 
 or use setup callback:
 
 ```ts
-router.useScene("name", (scene) => {
+router.scene("name", (scene) => {
 	scene.use(/* ... */)
 })
 ```
@@ -141,7 +141,7 @@ router.useScene("name", (scene) => {
 or a shortcut:
 
 ```ts
-router.useScene("name").use(/* ... */)
+router.scene("name").use(/* ... */)
 ```
 
 ### Entering scenes

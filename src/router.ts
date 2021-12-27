@@ -9,16 +9,22 @@ import { ScenesFlavoredContext } from "./types"
 export class SceneRouter<C extends ScenesFlavoredContext> extends Composer<C> {
 	_scenes: Record<string, Scene<any>> = {}
 
-	useScene<C2 extends C>(scene: Scene<C2>) {
-		this._scenes[scene.name] = scene
-	}
+	scene<C2 extends C>(scene: Scene<C2>): Scene<C2>
+	scene<C2 extends C>(
+		name: string,
+		setup?: (scene: Scene<C2>) => void
+	): Scene<C2>
 
-	scene<C2 extends C>(name: string, setup?: (scene: Scene<C2>) => void) {
-		const scene = new Scene<C2>(name)
+	scene<C2 extends C>(
+		sceneOrName: Scene<C2> | string,
+		setup?: (scene: Scene<C2>) => void
+	) {
+		const scene =
+			typeof sceneOrName === "string" ? new Scene<C2>(sceneOrName) : sceneOrName
 		if (setup) {
 			setup(scene)
 		}
-		this._scenes[name] = scene
+		this._scenes[scene.name] = scene
 		return scene
 	}
 
