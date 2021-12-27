@@ -12,11 +12,7 @@ yarn add grammy-scenes
 
 ```ts
 import { Bot, Context, session, SessionFlavor } from "grammy"
-import {
-	scenes_control_middleware,
-	SceneSessionFlavor,
-	ScenesFlavor,
-} from "grammy-scenes"
+import { SceneSessionFlavor, ScenesFlavor } from "grammy-scenes"
 
 import { scenes } from "./scenes"
 
@@ -35,7 +31,7 @@ bot.use(
 )
 
 // Inject ctx.scenes
-bot.use(scenes_control_middleware(scenes))
+bot.use(scenes.manager())
 
 bot.command("start", async (ctx) => {
 	await ctx.reply(`Welcome here`)

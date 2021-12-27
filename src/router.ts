@@ -1,7 +1,8 @@
 import { Composer, MiddlewareFn } from "grammy"
+import { assert, Writable } from "ts-essentials"
 
 // Hack to avoid circular import
-import { Scene } from "."
+import { Scene, ScenesManager } from "."
 import { ScenesFlavoredContext } from "./types"
 
 /** Scene (or subscene) collector that will call scene by its name */
@@ -43,5 +44,15 @@ export class SceneRouter<C extends ScenesFlavoredContext> extends Composer<C> {
 			return []
 		})
 		return composer.middleware()
+	}
+
+	/** Middleware that injects ctx.scenes */
+	manager(): MiddlewareFn<C> {
+		return (ctx, next) => {
+			assert(!ctx.scenes, "ctx.scenes has already been installed.")
+			const ctx2 = ctx as Writable<C>
+			ctx2.scenes = new ScenesManager(ctx, this)
+			return next()
+		}
 	}
 }
