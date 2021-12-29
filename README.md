@@ -183,6 +183,16 @@ await ctx.scenes.move("sibling_scene", { item_id: 123 })
 
 Similarly, `enter` handlers for subscenes will be called if configured.
 
+### Leaving the scene
+
+To stop the scene, call:
+
+```ts
+ctx.scenes.leave()
+```
+
+Moving to a scene without any handlers (other than `enter`) has the similar effect.
+
 ### "Continuing" scenes
 
 `grammy-scenes` allows to "continue" a scene on an external event.

@@ -34,6 +34,10 @@ export class ScenesManager {
 		)
 	}
 
+	leave() {
+		this._ctx.session._scene = undefined
+	}
+
 	async _enter_inner(path: string, arg?: any) {
 		const scene = this._get_scene_by_path(path)
 		Object.assign(this._ctx.session._scene, {
