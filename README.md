@@ -55,7 +55,7 @@ import { MyBotContext } from "../bot"
 import { add_item_scene } from "./add_item"
 
 export const scenes = new SceneRouter<MyBotContext>()
-scenes.scene(add_item_scene)
+scenes.scene("add_item", add_item_scene)
 // Other scenes added similarly
 ```
 
@@ -75,7 +75,7 @@ export const add_item_scene = new Scene<
 				item_price?: number
 			}
 		}>
->("add_item")
+>()
 
 // "Enter" handler will be called once when a scene is entered.
 add_item_scene.enter(async (ctx) => {
@@ -125,15 +125,17 @@ add_item_scene.scene("complete").enter(async (ctx) => {
 To setup a scene, either simply setup a `Scene` object:
 
 ```ts
-const scene = new Scene("name")
+const scene = new Scene()
+scene.enter(/* ... */)
 scene.use(/* ... */)
-router.scene(scene)
+router.scene("name", scene)
 ```
 
 or use setup callback:
 
 ```ts
 router.scene("name", (scene) => {
+	scene.enter(/* ... */)
 	scene.use(/* ... */)
 })
 ```
@@ -141,7 +143,7 @@ router.scene("name", (scene) => {
 or a shortcut:
 
 ```ts
-router.scene("name").use(/* ... */)
+router.scene("name").enter(/* ... */)
 ```
 
 ### Entering scenes
