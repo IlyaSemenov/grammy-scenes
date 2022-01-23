@@ -10,6 +10,7 @@ module.exports = {
 		"simple-import-sort/imports": "warn",
 		"simple-import-sort/exports": "warn",
 		"@typescript-eslint/no-explicit-any": "off",
+		"@typescript-eslint/no-non-null-assertion": "off",
 		"@typescript-eslint/explicit-module-boundary-types": "off",
 	},
 }

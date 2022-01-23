@@ -1,25 +1,64 @@
-import { Context } from "grammy"
-import { assert, AsyncOrSync } from "ts-essentials"
+import { Composer, Middleware, MiddlewareFn } from "grammy"
+import { SafeDictionary } from "ts-essentials"
 
-import { SceneRouter } from "./router"
-import { ScenesFlavoredContext } from "./types"
+import { SceneFlavoredContext, ScenesFlavoredContext } from "."
 
-type HandlerFn<C extends Context> = (ctx: C, arg?: any) => AsyncOrSync<void>
+export class Scene<
+	C extends ScenesFlavoredContext = ScenesFlavoredContext,
+	S = undefined
+> extends Composer<SceneFlavoredContext<C, S>> {
+	steps: Array<Composer<SceneFlavoredContext<C, S>>> = []
+	pos_by_label: SafeDictionary<number> = {}
 
-/** A single scene, which is also a router for sub-scenes */
-export class Scene<C extends ScenesFlavoredContext> extends SceneRouter<C> {
-	_enter_handler?: HandlerFn<C>
-	_continue_handler?: HandlerFn<C>
-
-	/** set scene enter handler */
-	enter(handler: HandlerFn<C>) {
-		assert(!this._enter_handler)
-		this._enter_handler = handler
+	constructor(public readonly id: string) {
+		super()
 	}
 
-	/** set scene continuation request handler */
-	continue(handler: HandlerFn<C>) {
-		assert(!this._continue_handler)
-		this._continue_handler = handler
+	use(...middleware: Array<Middleware<SceneFlavoredContext<C, S>>>) {
+		const composer = super.use(...middleware)
+		this.steps.push(composer)
+		return composer
 	}
+
+	do(mw: MiddlewareFn<SceneFlavoredContext<C, S>>) {
+		this.use(async (ctx, next) => {
+			await mw(ctx, async () => undefined)
+			return next()
+		})
+	}
+
+	wait(...middleware: Array<Middleware<SceneFlavoredContext<C, S>>>) {
+		this.use((ctx) => {
+			ctx.scene.wait()
+		})
+		return this.mustResume(...middleware)
+	}
+
+	mustResume(...middleware: Array<Middleware<SceneFlavoredContext<C, S>>>) {
+		const composer = new Composer<SceneFlavoredContext<C, S>>((ctx, next) => {
+			ctx.scene._must_resume = true
+			return next()
+		}, ...middleware)
+		this.steps.push(composer)
+		return composer
+	}
+
+	call(sceneId: string, arg?: any) {
+		this.do((ctx) => ctx.scene.call(sceneId, arg))
+	}
+
+	label(label: string) {
+		this.pos_by_label[label] = this.steps.length
+	}
+
+	middleware() {
+		throw Error(`Scene is not supposed to be used directly as a middleware.`)
+		return super.middleware() // Prevent type error
+	}
+}
+
+export function ftilerResume(
+	ctx: SceneFlavoredContext<ScenesFlavoredContext, any>
+) {
+	return ctx.scene.opts?.resume === true
 }

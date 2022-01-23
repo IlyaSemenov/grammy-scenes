@@ -1,0 +1,42 @@
+import { MiddlewareFn, MiddlewareObj } from "grammy"
+import { assert, SafeDictionary } from "ts-essentials"
+
+import { Scene, ScenesFlavoredContext, ScenesManager } from "."
+
+export class ScenesComposer<C extends ScenesFlavoredContext>
+	implements MiddlewareObj<C>
+{
+	scenes: SafeDictionary<Scene<C>> = {}
+
+	constructor(...scenes: Scene<C>[]) {
+		for (const scene of scenes) {
+			this.scene(scene)
+		}
+	}
+
+	scene(scene: Scene<C, any>) {
+		assert(!this.scenes[scene.id], `Scene ${scene.id} already registered.`)
+		this.scenes[scene.id] = scene
+	}
+
+	manager(): MiddlewareFn<C> {
+		const mw: MiddlewareFn<C> = (ctx, next) => {
+			const writable_ctx = ctx as any
+			writable_ctx.scenes = new ScenesManager<C>(ctx, this.scenes)
+			return next()
+		}
+		return mw
+	}
+
+	middleware() {
+		const mw: MiddlewareFn<C> = async (ctx, next) => {
+			const stack = ctx.session.scenes?.stack
+			if (stack) {
+				await ctx.scenes._run_stack(stack)
+			} else {
+				return next()
+			}
+		}
+		return mw
+	}
+}

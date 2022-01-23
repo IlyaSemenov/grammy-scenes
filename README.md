@@ -17,25 +17,25 @@ import { SceneSessionFlavor, ScenesFlavor } from "grammy-scenes"
 import { scenes } from "./scenes"
 
 type SessionData = SceneSessionFlavor & {
-	// Your own global session interface, could be empty as well.
+  // Your own global session interface, could be empty as well.
 }
 
-export type MyBotContext = Context & SessionFlavor<SessionData> & ScenesFlavor
+export type BotContext = Context & SessionFlavor<SessionData> & ScenesFlavor
 
-const bot = new Bot<MyBotContext>(process.env.BOT_TOKEN)
+const bot = new Bot<BotContext>(process.env.BOT_TOKEN)
 
 bot.use(
-	session({
-		initial: () => ({}),
-	})
+  session({
+    initial: () => ({}),
+  })
 )
 
 // Inject ctx.scenes
 bot.use(scenes.manager())
 
 bot.command("start", async (ctx) => {
-	await ctx.reply(`Welcome here`)
-	await ctx.scenes.enter("add_item")
+  await ctx.reply(`Welcome here.`)
+  await ctx.scenes.enter("main")
 })
 
 // Actually run scenes
@@ -46,241 +46,217 @@ bot.start()
 
 ### Scenes
 
-Typically, you will have a single root scene router:
+Typically, you will want to have a single root scenes composer:
 
 ```ts
-import { SceneRouter } from "grammy-scenes"
+import { ScenesComposer } from "grammy-scenes"
 
-import { MyBotContext } from "../bot"
-import { add_item_scene } from "./add_item"
+import { BotContext } from "../bot"
+import { mainScene } from "./main"
+import { otherScene } from "./other"
 
-export const scenes = new SceneRouter<MyBotContext>()
-scenes.scene("add_item", add_item_scene)
-// Other scenes added similarly
+export const scenes = new ScenesComposer<BotContext>()
+scenes.scene(mainScene)
+scenes.scene(otherScene)
+
+// or:
+export const scenes = new ScenesComposer<BotContext>(mainScene, otherScene)
 ```
 
 and decompose each scene into its own module:
 
 ```ts
-import { SessionFlavor } from "grammy"
 import { Scene } from "grammy-scenes"
 
-import { MyBotContext } from "../bot"
+import { BotContext } from "../bot"
 
-export const add_item_scene = new Scene<
-	MyBotContext &
-		SessionFlavor<{
-			add_item: {
-				item_name?: string
-				item_price?: number
-			}
-		}>
->()
+export const mainScene = new Scene<BotContext>("main")
 
-// "Enter" handler will be called once when a scene is entered.
-add_item_scene.enter(async (ctx) => {
-	ctx.session.add_item = {}
-	// inner() moves to a subscene.
-	await ctx.scenes.inner("enter_name")
+// Scene extends Composer, so you may use all methods such as .use() .on() etc.
+mainScene.use((ctx, next) => {
+  console.log("Entering main scene...")
+  return next()
 })
 
-add_item_scene.scene("enter_name", (scene) => {
-	// Subscenes also have "enter" handlers.
-	scene.enter(async (ctx) => {
-		await ctx.reply(`Enter name`)
-	})
-	scene.on("message:text", async (ctx) => {
-		ctx.session.add_item.name = ctx.message.text
-		// move() moves to a sibling (sub)scene.
-		await ctx.scene.move("enter_price")
-	})
+// Simply put, do() is a use() which automatically calls next()
+mainScene.do(async (ctx) => {
+  await ctx.reply(`Enter your name:`)
 })
 
-add_item_scene.scene("enter_price", (scene) => {
-	scene.enter(async (ctx) => {
-		await ctx.reply(`Enter price`)
-	})
-	scene.on("message:text", async (ctx) => {
-		const price = Number(ctx.message.text)
-		if (price > 0) {
-			ctx.session.add_item.name = ctx.message.text
-			await ctx.scene.move("complete")
-		} else {
-			await ctx.reply(`Enter valid price!`)
-		}
-	})
+// As the flow comes to wait() middleware, the execution will stop and next Telegram updates will be passed to the inner middleware.
+// The inner middleware should call ctx.scene.resume() to proceed to the next scene step.
+mainScene.wait().on("message:text", async (ctx) => {
+  const name = ctx.message.text
+  if (name.toLowerCase() === "john") {
+    await ctx.reply(`Welcome, ${name}!`)
+    // Proceed to the next step.
+    ctx.scene.resume()
+  } else {
+    // Keep the execution in the current wait() block.
+    await ctx.reply(`${name}, your are not welcome here.`)
+  }
 })
 
-add_item_scene.scene("complete").enter(async (ctx) => {
-	// Work with session data.
-	await ItemModel.query().insert(ctx.session.add_item)
-	await ctx.reply(`Item saved!`)
+// Mark position in the scene to be able to jump to it (see below).
+mainScene.label("start")
+
+// A scene may unconditionally call a nested scene.
+// See sample captcha implementation below.
+mainScene.call("captcha")
+
+mainScene.do(async (ctx) => {
+  await ctx.reply(`Please choose:`, {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          { text: "Start over", callback_data: "start" },
+          { text: "Add item", callback_data: "add_item" },
+          { text: "Other", callback_data: "other" },
+        ],
+      ],
+    },
+  })
 })
-```
 
-## API
-
-### Scene registration
-
-To setup a scene, either simply setup a `Scene` object:
-
-```ts
-const scene = new Scene()
-scene.enter(/* ... */)
-scene.use(/* ... */)
-router.scene("name", scene)
-```
-
-or use setup callback:
-
-```ts
-router.scene("name", (scene) => {
-	scene.enter(/* ... */)
-	scene.use(/* ... */)
+mainScene.wait().on("callback_query:data", async (ctx) => {
+  await ctx.answerCallbackQuery()
+  const choice = ctx.callbackQuery.data
+  if (choice === "start") {
+    // Jump to the label marked above.
+    ctx.scene.goto("start")
+  } else if (choice === "add_item") {
+    // Conditionally call a nested scene.
+    // Implies automatic resume after the nested scene completes.
+    ctx.scene.call("add_item")
+  } else {
+    await ctx.reply(`This is not implemented.`)
+  }
 })
+
+mainScene.do((ctx) => ctx.reply(`Main scene finished`))
 ```
 
-or a shortcut:
+### Scene argument
 
 ```ts
-router.scene("name").enter(/* ... */)
-```
+bot.command("start", (ctx) =>
+  ctx.scenes.enter(
+    "main",
+    // Pass any data (not necessarily serializable).
+    // The payload will be accessible as ctx.scene.arg in the first scene middleware, and then discarded.
+    { title: "mylord" }
+  )
+)
 
-### Entering scenes
-
-To enter a top-level scene, use `ctx.scenes.enter(...)`, optionally passing a single argument:
-
-```ts
-await ctx.scenes.enter("scene_name")
-// or
-await ctx.scenes.enter("scene_name", { item_id: 123 })
-```
-
-if the scene has `enter` handler, it will be immediatelly called:
-
-```ts
-scene.enter(async (ctx, arg) => {
-	// will be called on ctx.scenes.enter(...)
-	// arg will be { item_id: 123 }
+mainScene.do(async (ctx) => {
+  await ctx.reply(`Enter your name, ${ctx.scene.arg?.title || "mortal"}:`)
 })
 ```
 
-### Moving through scenes
+### Scene session context
 
-To proceed to a sibling scene:
-
-```ts
-await ctx.scenes.move("sibling_scene")
-// or
-await ctx.scenes.move("sibling_scene", { item_id: 123 })
-```
-
-To enter a nested sub-scene:
+A scene may use context-local session data.
+The session data is persisted during nested scenes calls, and is automatically discarded when the scene completes or aborts.
 
 ```ts
-await ctx.scenes.inner("subscene")
-// or
-await ctx.scenes.move("sibling_scene", { item_id: 123 })
-```
+import { Scene, compose } from "grammy-scenes"
+import { generateCaptcha } from "some-captcha-module"
 
-Similarly, `enter` handlers for subscenes will be called if configured.
+import { BotContext } from "../bot"
 
-### Leaving the scene
-
-To stop the scene, call:
-
-```ts
-ctx.scenes.leave()
-```
-
-Moving to a scene without any handlers (other than `enter`) has the similar effect.
-
-### "Continuing" scenes
-
-`grammy-scenes` allows to "continue" a scene on an external event.
-
-In the scenario above, let's say item data is processed by some kind of external library/remote API/whatever.
-During that time, user can continue working with the bot (even move away from the scene, e.g. by using a global /command).
-That's how one can setup that workflow:
-
-```ts
-add_item_scene.scene("enter_price", (scene) => {
-	// ...
-	scene.on("message:text", async (ctx) => {
-		// ...
-		await ctx.scene.move("saving")
-	})
+const captchaScene = new Scene<BotContext, { secret: string }>("captcha")
+captchaScene.do(async (ctx) => {
+  const { secret, image } = await generateCaptcha()
+  ctx.scene.session = { secret }
+  await ctx.reply(`Enter the letters you see below:`)
+  await ctx.replyWithPhoto(image)
 })
+captchaScene.wait(
+  // `compose` is a helper which creates a new Composer instance and runs the setup function against it.
+  compose((scene) => {
+    scene.on("message:text", async (ctx) => {
+      if (ctx.message.text === ctx.scene.session.secret) {
+        ctx.scene.resume()
+      } else {
+        await ctx.reply(`Try again!`)
+      }
+    })
+    scene.on("message:sticker", (ctx) => ctx.reply("No stickers please."))
+  })
+)
+captchaScene.do((ctx) => ctx.reply("Captcha solved!"))
+```
 
-add_item_scene.scene("saving", (scene) => {
-	scene.enter(async (ctx) => {
-		await ctx.reply(`Saving...`)
-		// Run some kind of long job.
-		processItemData({
-			data: ctx.session.add_item,
-			token: ctx.scenes.createContinueToken(),
-		})
-	})
-	scene.on("message:text", async (ctx) => {
-		// If user messages us, report that we are busy.
-		await ctx.reply(`Still saving...`)
-	})
-	scene.continue(async (ctx, arg) => {
-		// See below when this is called.
-		await ctx.scene.move("complete")
-	})
+### Resuming a paused scene
+
+Let's say you have a scene where user enters some data which is then processed by an external service.
+You will naturally want to resume the scene when the processing is complete, without having user to poll the bot by clicking some "Check Status" button.
+
+Consider the following example:
+
+```ts
+import { Scene, compose, filterResume } from "grammy-scenes"
+
+import { BotContext } from "../bot"
+
+const jobScene = new Scene<BotContext>("job")
+jobScene.do(async (ctx) => {
+  await ctx.reply(`Starting job...`)
+  const resume_token = ctx.scene.waitWithToken()
+  startJob({ chat_id: ctx.chat!.id, resume_token })
 })
+jobScene.mustResume().use(
+  compose((scene) => {
+    scene.filter(ftilerResume, async (ctx) => {
+      await ctx.reply(`Job completed with result: ${ctx.scene.arg}`)
+      ctx.scene.resume()
+    })
+    scene.on("message:text", async (ctx) => {
+      await ctx.reply(`Please wait until the job is complete.`)
+    })
+  })
+)
+```
 
-add_item_scene.scene("complete").enter(async (ctx) => {
-	await ctx.reply(`Item saved!`)
+To resume the scene, call `ctx.scenes.resume()` when the job completes:
+
+```ts
+onJobComplete(async ({ resumeToken, jobResult }) => {
+  await ctx.scenes.resume(resumeToken)
+  // or:
+  await ctx.scenes.resume(resumeToken, jobResult)
 })
 ```
 
-To "continue" in an external handler, use:
+#### Resuming a scene without having chat context
+
+In the example above, the imaginary external event handler is supposed to somehow keep a reference to `ctx`.
+
+In real world, that is not always possible. The continuation request could come from a message queue processor or a HTTP server, or the bot server could be restarted.
+
+To resume a scene without having a chat context, you can use [grammy-pseudo-update](https://github.com/IlyaSemenov/grammy-pseudo-update):
 
 ```ts
-await ctx.scenes.continue(token)
-// or
-await ctx.scenes.continue(token, { result: 123 })
-```
+import { pseudoUpdate } from "grammy-pseudo-update"
 
-If the scene has moved on, this will be silently ignored.
+// ...
 
-### Integration with `grammy-pseudo-update`
-
-In the "continue" example above, the imaginary external handler is supposed to somehow keep a reference to `ctx`.
-
-In real world, that is not always possible. The continuation request could come from e.g. message queue processor or a HTTP server.
-
-To achieve that, `grammy-scenes` provides integration with [grammy-pseudo-update](https://github.com/IlyaSemenov/grammy-pseudo-update):
-
-```ts
-import { scenesPseudoUpdate } from "grammy-scenes/pseudo-update"
+bot.use(session(/* ... */))
+bot.use(scenes.manager())
+bot.use(pseudoUpdate) // <---- install pseudo update executor
 
 // ...
 
 bot.use(scenes)
-bot.use(scenesPseudoUpdate)
 
-onSomeExternalEvent(({ chat_id, token, arg }) => {
-	bot.handlePseudoUpdate({
-		chat_id,
-		payload: {
-			scenes: { _: "continue", token, arg },
-		},
-	})
+// ...
+
+onSomeExternalEvent(({ chat_id, resume_token, payload }) => {
+  bot.handlePseudoUpdate({ chat_id }, async (ctx) => {
+    // This code will be executed by the executor installed above.
+    await ctx.scenes.resume(resume_token, payload)
+  })
 })
 
 bot.start()
-```
-
-Similarly, it's possible to "enter" a scene with:
-
-```ts
-bot.handlePseudoUpdate({
-	chat_id,
-	payload: {
-		scenes: { _: "enter", scene, arg },
-	},
-})
 ```

@@ -1,13 +1,19 @@
 import { Context, SessionFlavor } from "grammy"
 
-import { ScenesManager } from "./manager"
+import { ScenesManager } from "."
 
 /** Flavor to grammy session */
-export interface SceneSessionFlavor {
-	_scene?: {
-		path: string
-		continue_token?: string
+export interface ScenesSessionFlavor {
+	scenes?: {
+		stack: SceneStackFrame[]
 	}
+}
+
+export interface SceneStackFrame {
+	scene: string
+	pos: number
+	context?: any
+	token?: string
 }
 
 /** Flavor to grammy context */
@@ -16,8 +22,6 @@ export type ScenesFlavor = {
 }
 
 /** Grammy context, flavored with scenes */
-export type ScenesFlavoredContext<C extends BaseContext = BaseContext> = C &
+export type ScenesFlavoredContext<C extends Context = Context> = C &
+	SessionFlavor<ScenesSessionFlavor> &
 	ScenesFlavor
-
-/** The most generic grammy context that grammy-scenes can work with */
-type BaseContext = Context & SessionFlavor<SceneSessionFlavor>
