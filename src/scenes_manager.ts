@@ -36,7 +36,7 @@ export class ScenesManager<
 			let finished: boolean
 			if (handler) {
 				const inner_ctx = this.ctx as any
-				const scene_manager = new SceneManager<C, any>(inner_ctx, frame, opts)
+				const scene_manager = new SceneManager(frame, opts)
 				opts = undefined
 				inner_ctx.scene = scene_manager
 				try {

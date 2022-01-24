@@ -3,9 +3,8 @@ import { v4 as uuid_v4 } from "uuid"
 import { SceneRunOpts, ScenesFlavoredContext, SceneStackFrame } from "."
 
 /** injected as ctx.scene */
-export class SceneManager<C extends ScenesFlavoredContext, S> {
+export class SceneManager<S = unknown> {
 	constructor(
-		public readonly ctx: C,
 		public readonly frame: SceneStackFrame,
 		public readonly opts?: SceneRunOpts
 	) {}
@@ -56,5 +55,5 @@ export class SceneManager<C extends ScenesFlavoredContext, S> {
 }
 
 export type SceneFlavoredContext<C extends ScenesFlavoredContext, S> = C & {
-	readonly scene: SceneManager<C, S>
+	readonly scene: SceneManager<S>
 }
