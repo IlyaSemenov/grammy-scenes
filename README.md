@@ -207,7 +207,7 @@ jobScene.do(async (ctx) => {
 })
 jobScene.mustResume().use(
   compose((scene) => {
-    scene.filter(ftilerResume, async (ctx) => {
+    scene.filter(filterResume, async (ctx) => {
       await ctx.reply(`Job completed with result: ${ctx.scene.arg}`)
       ctx.scene.resume()
     })

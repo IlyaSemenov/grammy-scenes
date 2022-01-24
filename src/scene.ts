@@ -57,7 +57,7 @@ export class Scene<
 	}
 }
 
-export function ftilerResume(
+export function filterResume(
 	ctx: SceneFlavoredContext<ScenesFlavoredContext, any>
 ) {
 	return ctx.scene.opts?.resume === true

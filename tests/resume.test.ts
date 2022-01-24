@@ -1,7 +1,7 @@
 import { Context, SessionFlavor } from "grammy"
 import {
 	compose,
-	ftilerResume,
+	filterResume,
 	Scene,
 	ScenesFlavor,
 	ScenesSessionFlavor,
@@ -28,7 +28,7 @@ scene.do(async (ctx) => {
 })
 scene.mustResume().use(
 	compose((bot) => {
-		bot.filter(ftilerResume, async (ctx) => {
+		bot.filter(filterResume, async (ctx) => {
 			await ctx.reply(`Job finished: ${ctx.scene.arg}`)
 			ctx.scene.resume()
 		})
