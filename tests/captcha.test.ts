@@ -1,10 +1,5 @@
 import { Context, SessionFlavor } from "grammy"
-import {
-	compose,
-	Scene,
-	ScenesFlavor,
-	ScenesSessionFlavor,
-} from "grammy-scenes"
+import { Scene, ScenesFlavor, ScenesSessionFlavor } from "grammy-scenes"
 
 import { create_bot } from "./lib/bot"
 
@@ -19,18 +14,16 @@ captcha_scene.do(async (ctx) => {
 	ctx.scene.session = { secret }
 	await ctx.reply(`Enter the letters you see below: (${secret})`)
 })
-captcha_scene.wait(
-	compose((step) => {
-		step.on("message:text", async (ctx) => {
-			if (ctx.message.text === ctx.scene.session.secret) {
-				ctx.scene.resume()
-			} else {
-				await ctx.reply(`Try again!`)
-			}
-		})
-		step.on("message:sticker", (ctx) => ctx.reply("No stickers please."))
+captcha_scene.wait().setup((scene) => {
+	scene.on("message:text", async (ctx) => {
+		if (ctx.message.text === ctx.scene.session.secret) {
+			ctx.scene.resume()
+		} else {
+			await ctx.reply(`Try again!`)
+		}
 	})
-)
+	scene.on("message:sticker", (ctx) => ctx.reply("No stickers please."))
+})
 captcha_scene.do((ctx) => ctx.reply("Captcha solved!"))
 
 const welcome_scene = new Scene("welcome")

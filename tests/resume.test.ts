@@ -1,6 +1,5 @@
 import { Context, SessionFlavor } from "grammy"
 import {
-	compose,
 	filterResume,
 	Scene,
 	ScenesFlavor,
@@ -26,32 +25,28 @@ scene.do(async (ctx) => {
 		jobs.push({ chat_id: ctx.chat!.id, resume_token })
 	}, 500)
 })
-scene.wait().use(
-	compose((bot) => {
-		bot.filter(filterResume, async (ctx) => {
-			await ctx.reply(`Job finished: ${ctx.scene.arg}`)
-			ctx.scene.resume()
-		})
-		bot.on("message:text", async (ctx) => {
-			await ctx.reply(`Please wait until the job is done.`)
-		})
+scene.wait().setup((bot) => {
+	bot.filter(filterResume, async (ctx) => {
+		await ctx.reply(`Job finished: ${ctx.scene.arg}`)
+		ctx.scene.resume()
 	})
-)
+	bot.on("message:text", async (ctx) => {
+		await ctx.reply(`Please wait until the job is done.`)
+	})
+})
 
 scene.do((ctx) => ctx.reply("Enter your name"))
 
-scene.wait().use(
-	compose((bot) => {
-		bot.filter(filterResume, async (ctx) => {
-			// This wait is not supposed to be resumed by the old token.
-			await ctx.reply(`This should never happen!`)
-		})
-		bot.on("message:text", async (ctx) => {
-			await ctx.reply(`Welcome, ${ctx.message.text}`)
-			ctx.scene.resume()
-		})
+scene.wait().setup((bot) => {
+	bot.filter(filterResume, async (ctx) => {
+		// This wait is not supposed to be resumed by the old token.
+		await ctx.reply(`This should never happen!`)
 	})
-)
+	bot.on("message:text", async (ctx) => {
+		await ctx.reply(`Welcome, ${ctx.message.text}`)
+		ctx.scene.resume()
+	})
+})
 
 scene.do((ctx) => ctx.reply("Finished"))
 

@@ -159,7 +159,7 @@ A scene may use context-local session data.
 The session data is persisted during nested scenes calls, and is automatically discarded when the scene completes or aborts.
 
 ```ts
-import { Scene, compose } from "grammy-scenes"
+import { Scene } from "grammy-scenes"
 import { generateCaptcha } from "some-captcha-module"
 
 import { BotContext } from "../bot"
@@ -171,19 +171,18 @@ captchaScene.do(async (ctx) => {
   await ctx.reply(`Enter the letters you see below:`)
   await ctx.replyWithPhoto(image)
 })
-captchaScene.wait(
-  // `compose` is a helper which creates a new Composer instance and runs the setup function against it.
-  compose((scene) => {
-    scene.on("message:text", async (ctx) => {
-      if (ctx.message.text === ctx.scene.session.secret) {
-        ctx.scene.resume()
-      } else {
-        await ctx.reply(`Try again!`)
-      }
-    })
-    scene.on("message:sticker", (ctx) => ctx.reply("No stickers please."))
+captchaScene.wait().setup((scene) => {
+  // `setup` is a helper which simply runs the setup function against the current composer.
+  // See https://github.com/grammyjs/grammY/issues/163
+  scene.on("message:text", async (ctx) => {
+    if (ctx.message.text === ctx.scene.session.secret) {
+      ctx.scene.resume()
+    } else {
+      await ctx.reply(`Try again!`)
+    }
   })
-)
+  scene.on("message:sticker", (ctx) => ctx.reply("No stickers please."))
+})
 captchaScene.do((ctx) => ctx.reply("Captcha solved!"))
 ```
 
@@ -195,7 +194,7 @@ You will naturally want to resume the scene when the processing is complete, wit
 Consider the following example:
 
 ```ts
-import { Scene, compose, filterResume } from "grammy-scenes"
+import { Scene, filterResume } from "grammy-scenes"
 
 import { BotContext } from "../bot"
 
@@ -205,17 +204,15 @@ jobScene.do(async (ctx) => {
   const resume_token = ctx.scene.createResumeToken()
   startJob({ chat_id: ctx.chat!.id, resume_token })
 })
-jobScene.wait().use(
-  compose((scene) => {
-    scene.filter(filterResume, async (ctx) => {
-      await ctx.reply(`Job completed with result: ${ctx.scene.arg}`)
-      ctx.scene.resume()
-    })
-    scene.on("message:text", async (ctx) => {
-      await ctx.reply(`Please wait until the job is complete.`)
-    })
+jobScene.wait().setup((scene) => {
+  scene.filter(filterResume, async (ctx) => {
+    await ctx.reply(`Job completed with result: ${ctx.scene.arg}`)
+    ctx.scene.resume()
   })
-)
+  scene.on("message:text", async (ctx) => {
+    await ctx.reply(`Please wait until the job is complete.`)
+  })
+})
 ```
 
 To resume the scene, call `ctx.scenes.resume()` when the job completes:
