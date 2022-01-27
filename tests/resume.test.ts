@@ -25,24 +25,24 @@ scene.do(async (ctx) => {
 		jobs.push({ chat_id: ctx.chat!.id, resume_token })
 	}, 500)
 })
-scene.wait().setup((bot) => {
-	bot.filter(filterResume, async (ctx) => {
+scene.wait().setup((scene) => {
+	scene.resume(async (ctx) => {
 		await ctx.reply(`Job finished: ${ctx.scene.arg}`)
 		ctx.scene.resume()
 	})
-	bot.on("message:text", async (ctx) => {
+	scene.on("message:text", async (ctx) => {
 		await ctx.reply(`Please wait until the job is done.`)
 	})
 })
 
 scene.do((ctx) => ctx.reply("Enter your name"))
 
-scene.wait().setup((bot) => {
-	bot.filter(filterResume, async (ctx) => {
+scene.wait().setup((scene) => {
+	scene.resume(async (ctx) => {
 		// This wait is not supposed to be resumed by the old token.
 		await ctx.reply(`This should never happen!`)
 	})
-	bot.on("message:text", async (ctx) => {
+	scene.on("message:text", async (ctx) => {
 		await ctx.reply(`Welcome, ${ctx.message.text}`)
 		ctx.scene.resume()
 	})

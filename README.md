@@ -194,7 +194,7 @@ You will naturally want to resume the scene when the processing is complete, wit
 Consider the following example:
 
 ```ts
-import { Scene, filterResume } from "grammy-scenes"
+import { Scene } from "grammy-scenes"
 
 import { BotContext } from "../bot"
 
@@ -205,7 +205,8 @@ jobScene.do(async (ctx) => {
   startJob({ chat_id: ctx.chat!.id, resume_token })
 })
 jobScene.wait().setup((scene) => {
-  scene.filter(filterResume, async (ctx) => {
+  // Register middleware for future ctx.scenes.resume() call.
+  scene.resume(async (ctx) => {
     await ctx.reply(`Job completed with result: ${ctx.scene.arg}`)
     ctx.scene.resume()
   })
@@ -227,7 +228,7 @@ onJobComplete(async ({ resumeToken, jobResult }) => {
 
 #### Resuming a scene without having chat context
 
-In the example above, the imaginary external event handler is supposed to somehow keep a reference to `ctx`.
+In the example above, the imaginary external event handler is supposed to somehow keep the reference to `ctx`.
 
 In real world, that is not always possible. The continuation request could come from a message queue processor or a HTTP server, or the bot server could be restarted.
 
