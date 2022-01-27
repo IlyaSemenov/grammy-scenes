@@ -6,9 +6,9 @@ import { Scene, ScenesFlavoredContext, ScenesManager } from "."
 export class ScenesComposer<C extends ScenesFlavoredContext>
 	implements MiddlewareObj<C>
 {
-	scenes: SafeDictionary<Scene<C>> = {}
+	scenes: SafeDictionary<Scene<C, any>> = {}
 
-	constructor(...scenes: Scene<C>[]) {
+	constructor(...scenes: Scene<C, any>[]) {
 		for (const scene of scenes) {
 			this.scene(scene)
 		}
