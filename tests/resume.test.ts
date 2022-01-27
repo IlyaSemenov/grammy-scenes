@@ -20,13 +20,13 @@ const jobs: Job[] = []
 
 const scene = new Scene<BotContext>("main")
 scene.do(async (ctx) => {
-	const resume_token = ctx.scene.waitWithToken()
+	const resume_token = ctx.scene.createResumeToken()
 	await ctx.reply(`Starting job...`)
 	setTimeout(() => {
 		jobs.push({ chat_id: ctx.chat!.id, resume_token })
 	}, 500)
 })
-scene.mustResume().use(
+scene.wait().use(
 	compose((bot) => {
 		bot.filter(filterResume, async (ctx) => {
 			await ctx.reply(`Job finished: ${ctx.scene.arg}`)

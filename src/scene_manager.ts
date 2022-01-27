@@ -27,10 +27,9 @@ export class SceneManager<S = unknown> {
 		this._wait_request = true
 	}
 
-	waitWithToken() {
+	createResumeToken() {
 		const token = uuid_v4()
 		this.frame.token = token
-		this.wait()
 		return token
 	}
 

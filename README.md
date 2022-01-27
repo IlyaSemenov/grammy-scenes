@@ -202,10 +202,10 @@ import { BotContext } from "../bot"
 const jobScene = new Scene<BotContext>("job")
 jobScene.do(async (ctx) => {
   await ctx.reply(`Starting job...`)
-  const resume_token = ctx.scene.waitWithToken()
+  const resume_token = ctx.scene.createResumeToken()
   startJob({ chat_id: ctx.chat!.id, resume_token })
 })
-jobScene.mustResume().use(
+jobScene.wait().use(
   compose((scene) => {
     scene.filter(filterResume, async (ctx) => {
       await ctx.reply(`Job completed with result: ${ctx.scene.arg}`)
