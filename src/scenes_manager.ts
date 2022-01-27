@@ -67,6 +67,7 @@ export class ScenesManager<
 				if (scene_manager._must_resume) {
 					if (scene_manager._resume_request) {
 						frame.pos++
+						delete frame.token
 						delete this.ctx.session.scenes
 						continue
 					} else {
