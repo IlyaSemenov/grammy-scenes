@@ -7,7 +7,7 @@ declare module "grammy" {
 		 *
 		 * See https://github.com/grammyjs/grammY/issues/163
 		 * */
-		setup(setup: (composer: Composer<C>) => void): this
+		setup(setup: (composer: this) => void): this
 	}
 }
 
