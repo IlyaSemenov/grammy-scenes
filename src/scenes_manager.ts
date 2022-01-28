@@ -23,12 +23,20 @@ export class ScenesManager<
 	async resume(token: string, arg?: unknown) {
 		const stack = this.ctx.session.scenes?.stack
 		if (stack && token && stack[0]?.token === token) {
-			delete this.ctx.session.scenes
 			await this._run_stack(stack, { arg, resume: true })
 		}
 	}
 
 	async _run_stack(stack: SceneStackFrame[], opts?: SceneRunOpts) {
+		// By default, delete the stack from the session. Re-save it explicitly in two cases:
+		//
+		// 1) ctx.scene.wait()
+		// 2) ctx.scene.mustResume() without ctx.scene.resume()
+		//
+		// Deleting the stack earlier rather than on demand allows to handle cases
+		// such as entering a different scenes without finishing the first one.
+		delete this.ctx.session.scenes
+
 		while (stack[0]) {
 			const frame = stack[0]
 			const scene = this.scenes[frame.scene]
