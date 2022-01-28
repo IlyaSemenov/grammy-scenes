@@ -84,19 +84,15 @@ export class ScenesManager<
 					frame.pos++
 					this.ctx.session.scenes = { stack }
 					return
-				} else {
+				} else if (finished) {
 					frame.pos++
 					continue
+				} else {
+					// Middleware didn't call next() and didn't ask to wait; stop execution.
+					return
 				}
-			} else {
-				finished = true
 			}
-			if (finished) {
-				stack.shift()
-			} else {
-				// Middleware never reached wait, call, or end of flow; stop execution.
-				return
-			}
+			stack.shift()
 		}
 	}
 }
