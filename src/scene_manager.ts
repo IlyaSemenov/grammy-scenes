@@ -61,10 +61,10 @@ export class SceneManager<S = unknown> {
 	_want_resume = false
 
 	/** Go to scene step marked with scene.label() */
-	goto(label: string) {
-		this._want_goto = label
+	goto(label: string, arg?: any) {
+		this._want_goto = { label, arg }
 	}
-	_want_goto?: string
+	_want_goto?: { label: string; arg?: any }
 }
 
 export type SceneFlavoredContext<C extends ScenesFlavoredContext, S> = C & {

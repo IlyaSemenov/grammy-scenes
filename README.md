@@ -154,6 +154,14 @@ mainScene.do(async (ctx) => {
 })
 ```
 
+The following API methods allow passing argument:
+
+- `ctx.scenes.enter`
+- `ctx.scenes.resume`
+- `ctx.scene.call`
+- `ctx.scene.goto`
+- `scene.call`
+
 ### Scene session context
 
 A scene may use context-local session data.

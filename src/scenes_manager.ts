@@ -60,13 +60,14 @@ export class ScenesManager<
 				if (scene_manager._want_abort) {
 					finished = true
 				} else if (scene_manager._want_goto) {
-					const label = scene_manager._want_goto
+					const { label, arg } = scene_manager._want_goto
 					const pos = scene.pos_by_label[label]
 					assert(
 						pos !== undefined,
 						`Scene ${scene.id} doesn't have label ${label}.`
 					)
 					frame.pos = pos
+					opts = { arg }
 					continue
 				} else if (scene_manager._want_call) {
 					const { scene_id, arg } = scene_manager._want_call
