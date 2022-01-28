@@ -1,14 +1,6 @@
-import { Context, SessionFlavor } from "grammy"
-import {
-	filterResume,
-	Scene,
-	ScenesFlavor,
-	ScenesSessionFlavor,
-} from "grammy-scenes"
+import { Scene } from "grammy-scenes"
 
-import { create_bot } from "./lib/bot"
-
-type BotContext = Context & ScenesFlavor & SessionFlavor<ScenesSessionFlavor>
+import { BotContext, create_bot } from "./lib/bot"
 
 interface Job {
 	chat_id: number
@@ -50,9 +42,7 @@ scene.wait().setup((scene) => {
 
 scene.do((ctx) => ctx.reply("Finished"))
 
-const bot = create_bot(scene)
-
-if (process.env.BOT_TOKEN) {
+create_bot([scene], (bot) => {
 	setInterval(() => {
 		const job = jobs.shift()
 		if (job) {
@@ -64,6 +54,4 @@ if (process.env.BOT_TOKEN) {
 			jobs.push(job)
 		}
 	}, 1000)
-
-	bot.start()
-}
+})

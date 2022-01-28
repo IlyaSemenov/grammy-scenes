@@ -1,9 +1,6 @@
-import { Context, SessionFlavor } from "grammy"
-import { Scene, ScenesFlavor, ScenesSessionFlavor } from "grammy-scenes"
+import { Scene } from "grammy-scenes"
 
-import { create_bot } from "./lib/bot"
-
-type BotContext = Context & ScenesFlavor & SessionFlavor<ScenesSessionFlavor>
+import { BotContext, create_bot } from "./lib/bot"
 
 const captcha_scene = new Scene<BotContext, { secret: string }>("captcha")
 captcha_scene.do(async (ctx) => {
@@ -66,8 +63,4 @@ main_scene.wait().on("callback_query:data", async (ctx) => {
 })
 main_scene.do((ctx) => ctx.reply(`Main scene finished`))
 
-const bot = create_bot(main_scene, captcha_scene, welcome_scene)
-
-if (process.env.BOT_TOKEN) {
-	bot.start()
-}
+create_bot([main_scene, captcha_scene, welcome_scene])
