@@ -32,6 +32,7 @@ export class ScenesComposer<C extends ScenesFlavoredContext>
 		const mw: MiddlewareFn<C> = async (ctx, next) => {
 			const stack = ctx.session.scenes?.stack
 			if (stack) {
+				delete ctx.session.scenes
 				await ctx.scenes._run_stack(stack)
 			} else {
 				return next()

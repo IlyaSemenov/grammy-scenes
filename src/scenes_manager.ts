@@ -23,6 +23,7 @@ export class ScenesManager<
 	async resume(token: string, arg?: unknown) {
 		const stack = this.ctx.session.scenes?.stack
 		if (stack && token && stack[0]?.token === token) {
+			delete this.ctx.session.scenes
 			await this._run_stack(stack, { arg, resume: true })
 		}
 	}
@@ -48,11 +49,6 @@ export class ScenesManager<
 					delete inner_ctx.scene
 				}
 
-				// By default, delete the stack. Save it explicitly in two cases below:
-				// 1) ctx.scene.wait()
-				// 2) ctx.scene.mustResume() without ctx.scene.resume()
-				delete this.ctx.session.scenes
-
 				if (scene_manager._want_abort) {
 					finished = true
 				} else if (scene_manager._want_goto) {
@@ -77,12 +73,12 @@ export class ScenesManager<
 						continue
 					} else {
 						// wait handler didn't ask to resume
-						this.ctx.session.scenes = { stack }
+						this.ctx.session.scenes ??= { stack }
 						return
 					}
 				} else if (scene_manager._want_wait) {
 					frame.pos++
-					this.ctx.session.scenes = { stack }
+					this.ctx.session.scenes ??= { stack }
 					return
 				} else if (finished) {
 					frame.pos++
