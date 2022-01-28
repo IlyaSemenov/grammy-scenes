@@ -36,7 +36,7 @@ export class Scene<
 
 	mustResume(...middleware: Array<Middleware<SceneFlavoredContext<C, S>>>) {
 		const composer = new Composer<SceneFlavoredContext<C, S>>((ctx, next) => {
-			ctx.scene._must_resume = true
+			ctx.scene.mustResume()
 			return next()
 		}, ...middleware)
 		this.steps.push(composer)

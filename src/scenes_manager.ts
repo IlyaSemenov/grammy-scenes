@@ -47,8 +47,16 @@ export class ScenesManager<
 				} finally {
 					delete inner_ctx.scene
 				}
-				if (scene_manager._label) {
-					const label = scene_manager._label
+
+				// By default, delete the stack. Save it explicitly in two cases below:
+				// 1) ctx.scene.wait()
+				// 2) ctx.scene.mustResume() without ctx.scene.resume()
+				delete this.ctx.session.scenes
+
+				if (scene_manager._want_abort) {
+					finished = true
+				} else if (scene_manager._want_goto) {
+					const label = scene_manager._want_goto
 					const pos = scene.pos_by_label[label]
 					assert(
 						pos !== undefined,
@@ -56,32 +64,30 @@ export class ScenesManager<
 					)
 					frame.pos = pos
 					continue
-				}
-				if (scene_manager._call_request) {
-					const { scene_id, arg } = scene_manager._call_request
+				} else if (scene_manager._want_call) {
+					const { scene_id, arg } = scene_manager._want_call
 					frame.pos++
 					stack.unshift({ scene: scene_id, pos: 0 })
 					opts = { arg }
 					continue
-				}
-				if (scene_manager._must_resume) {
-					if (scene_manager._resume_request) {
-						frame.pos++
+				} else if (scene_manager._must_resume) {
+					if (scene_manager._want_resume) {
 						delete frame.token
-						delete this.ctx.session.scenes
+						frame.pos++
 						continue
 					} else {
 						// wait handler didn't ask to resume
+						this.ctx.session.scenes = { stack }
 						return
 					}
-				}
-				if (scene_manager._wait_request) {
+				} else if (scene_manager._want_wait) {
 					frame.pos++
 					this.ctx.session.scenes = { stack }
 					return
+				} else {
+					frame.pos++
+					continue
 				}
-				frame.pos++
-				continue
 			} else {
 				finished = true
 			}

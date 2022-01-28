@@ -24,8 +24,7 @@
     "prepare": "husky install",
     "test": "npm run test:types && tap 'tests/**/*.test.ts'",
     "test:types": "tsc --noEmit",
-    "test:captcha": "NODE_OPTIONS='-r dotenv/config' nodemon --exec esr tests/captcha.test.ts",
-    "test:resume": "NODE_OPTIONS='-r dotenv/config' nodemon --exec esr tests/resume.test.ts"
+    "dev": "NODE_OPTIONS='-r dotenv/config' nodemon --exec esr"
   },
   "dependencies": {
     "ts-essentials": "^9.1.0",

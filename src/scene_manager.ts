@@ -9,6 +9,7 @@ export class SceneManager<S = unknown> {
 		public readonly opts?: SceneRunOpts
 	) {}
 
+	/** Return session data that is local to this scene. The data will be discarded once scene completes, and persisted during nested scene calls. */
 	get session() {
 		return this.frame.context as S
 	}
@@ -17,40 +18,53 @@ export class SceneManager<S = unknown> {
 		this.frame.context = value
 	}
 
+	/** Return optional payload passed to ctx.scenes.enter() or ctx.scenes.resume() */
 	get arg() {
 		return this.opts?.arg
 	}
 
-	_wait_request = false
-
-	wait() {
-		this._wait_request = true
+	/** Abort scene execution. Nested scene will return to outer scene. */
+	abort() {
+		this._want_abort = true
 	}
+	_want_abort = false
 
+	/** Break scene middleware flow, wait for new updates. */
+	wait() {
+		this._want_wait = true
+	}
+	_want_wait = false
+
+	/** Return a token that can be used later for ctx.scenes.resume() */
 	createResumeToken() {
 		const token = uuid_v4()
 		this.frame.token = token
 		return token
 	}
 
-	_call_request?: { scene_id: string; arg?: any }
-
+	/** Call nested scene, then go to the next step. */
 	call(sceneId: string, arg?: any) {
-		this._call_request = { scene_id: sceneId, arg }
+		this._want_call = { scene_id: sceneId, arg }
 	}
+	_want_call?: { scene_id: string; arg?: any }
 
+	/** This middleware must call ctx.scene.resume() to go to the next middleware. */
+	mustResume() {
+		this._must_resume = true
+	}
 	_must_resume = false
-	_resume_request = false
 
+	/** Go to the next middleware after this one completes. Used after ctx.scenes.wait() or ctx.scene.mustResume() */
 	resume() {
-		this._resume_request = true
+		this._want_resume = true
 	}
+	_want_resume = false
 
-	_label?: string
-
+	/** Go to scene step marked with scene.label() */
 	goto(label: string) {
-		this._label = label
+		this._want_goto = label
 	}
+	_want_goto?: string
 }
 
 export type SceneFlavoredContext<C extends ScenesFlavoredContext, S> = C & {

@@ -111,7 +111,7 @@ mainScene.do(async (ctx) => {
         [
           { text: "Start over", callback_data: "start" },
           { text: "Add item", callback_data: "add_item" },
-          { text: "Other", callback_data: "other" },
+          { text: "Exit", callback_data: "exit" },
         ],
       ],
     },
@@ -128,8 +128,9 @@ mainScene.wait().on("callback_query:data", async (ctx) => {
     // Conditionally call a nested scene.
     // Implies automatic resume after the nested scene completes.
     ctx.scene.call("add_item")
-  } else {
-    await ctx.reply(`This is not implemented.`)
+  } else if (choice === "exit") {
+    // Abort scene execution, don't call next middleware.
+    ctx.scene.abort()
   }
 })
 
@@ -183,7 +184,6 @@ captchaScene.wait().setup((scene) => {
   })
   scene.on("message:sticker", (ctx) => ctx.reply("No stickers please."))
 })
-captchaScene.do((ctx) => ctx.reply("Captcha solved!"))
 ```
 
 ### Resuming a paused scene
