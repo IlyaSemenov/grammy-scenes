@@ -161,6 +161,7 @@ The following API methods allow passing argument:
 - `ctx.scene.call`
 - `ctx.scene.goto`
 - `scene.call`
+- `scene.goto`
 
 ### Scene session context
 

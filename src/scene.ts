@@ -47,6 +47,10 @@ export class Scene<
 		this.do((ctx) => ctx.scene.call(sceneId, arg))
 	}
 
+	goto(label: string, arg?: any) {
+		this.do((ctx) => ctx.scene.goto(label, arg))
+	}
+
 	label(label: string) {
 		this.pos_by_label[label] = this.steps.length
 	}
