@@ -5,12 +5,12 @@ import { BotContext, create_bot } from "./lib/bot"
 const scene = new Scene<BotContext>("main")
 
 scene.do(async (ctx) => {
-	await ctx.reply(`Proceed or Abort immediately?`, {
+	await ctx.reply(`Proceed or Exit?`, {
 		reply_markup: {
 			inline_keyboard: [
 				[
 					{ text: "Proceed", callback_data: "proceed" },
-					{ text: "Abort", callback_data: "abort" },
+					{ text: "Exit", callback_data: "exit" },
 				],
 			],
 		},
@@ -21,8 +21,8 @@ scene.wait().on("callback_query:data", async (ctx) => {
 	await ctx.answerCallbackQuery()
 	if (ctx.callbackQuery.data === "proceed") {
 		ctx.scene.resume()
-	} else if (ctx.callbackQuery.data === "abort") {
-		ctx.scene.abort()
+	} else if (ctx.callbackQuery.data === "exit") {
+		ctx.scene.exit()
 	}
 })
 
@@ -31,7 +31,7 @@ scene.do(async (ctx) => {
 })
 scene.do(async (ctx) => {
 	await ctx.reply(`Step 2`)
-	ctx.scene.abort()
+	ctx.scene.exit()
 })
 scene.do(async (ctx) => {
 	await ctx.reply(`Step 3 (should not see this)`)

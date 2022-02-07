@@ -129,8 +129,8 @@ mainScene.wait().on("callback_query:data", async (ctx) => {
     // Implies automatic resume after the nested scene completes.
     ctx.scene.call("add_item")
   } else if (choice === "exit") {
-    // Abort scene execution, don't call next middleware.
-    ctx.scene.abort()
+    // Exit scene, don't call next middleware.
+    ctx.scene.exit()
   }
 })
 

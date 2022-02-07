@@ -23,11 +23,11 @@ export class SceneManager<S = unknown> {
 		return this.opts?.arg
 	}
 
-	/** Abort scene execution. Nested scene will return to outer scene. */
-	abort() {
-		this._want_abort = true
+	/** Exit scene. Nested scene will return to outer scene. */
+	exit() {
+		this._want_exit = true
 	}
-	_want_abort = false
+	_want_exit = false
 
 	/** Break scene middleware flow, wait for new updates. */
 	wait() {
