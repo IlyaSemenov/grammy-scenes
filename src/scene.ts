@@ -20,6 +20,7 @@ export class Scene<
 		return composer
 	}
 
+	/** Simply put, do() is a use() which automatically calls next() */
 	do(mw: MiddlewareFn<SceneFlavoredContext<C, S>>) {
 		this.use(async (ctx, next) => {
 			await mw(ctx, async () => undefined)
@@ -27,6 +28,7 @@ export class Scene<
 		})
 	}
 
+	/** Break scene middleware flow, wait for new updates. */
 	wait(...middleware: Array<Middleware<SceneFlavoredContext<C, S>>>) {
 		this.use((ctx) => {
 			ctx.scene.wait()
@@ -34,6 +36,7 @@ export class Scene<
 		return this.mustResume(...middleware)
 	}
 
+	/** This middleware must call ctx.scene.resume() to go to the next middleware. */
 	mustResume(...middleware: Array<Middleware<SceneFlavoredContext<C, S>>>) {
 		const composer = new Composer<SceneFlavoredContext<C, S>>((ctx, next) => {
 			ctx.scene.mustResume()
@@ -43,14 +46,17 @@ export class Scene<
 		return composer
 	}
 
+	/** Call nested scene, then go to the next step. */
 	call(sceneId: string, arg?: any) {
 		this.do((ctx) => ctx.scene.call(sceneId, arg))
 	}
 
+	/** Go to scene step marked with scene.label() */
 	goto(label: string, arg?: any) {
 		this.do((ctx) => ctx.scene.goto(label, arg))
 	}
 
+	/** Mark a named position in scene to be used by scene.goto() */
 	label(label: string) {
 		this.pos_by_label[label] = this.steps.length
 	}
