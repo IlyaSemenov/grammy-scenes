@@ -57,7 +57,12 @@ export class ScenesManager<
 					delete inner_ctx.scene
 				}
 
-				if (scene_manager._want_exit) {
+				if (scene_manager._want_enter) {
+					const { scene_id, arg } = scene_manager._want_enter
+					stack = [{ scene: scene_id, pos: 0 }]
+					opts = { arg }
+					continue
+				} else if (scene_manager._want_exit) {
 					finished = true
 				} else if (scene_manager._want_goto) {
 					const { label, arg } = scene_manager._want_goto

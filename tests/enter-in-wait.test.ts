@@ -9,9 +9,10 @@ scene1.do(async (ctx) => {
 		reply_markup: {
 			inline_keyboard: [
 				[
-					{ text: "Enter scene2", callback_data: "enter" },
-					{ text: "Continue", callback_data: "continue" },
+					{ text: "await scenes.enter", callback_data: "scenes_enter" },
+					{ text: "scene.enter", callback_data: "scene_enter" },
 				],
+				[{ text: "Resume this scene", callback_data: "resume" }],
 			],
 		},
 	})
@@ -19,9 +20,11 @@ scene1.do(async (ctx) => {
 
 scene1.wait().on("callback_query:data", async (ctx) => {
 	await ctx.answerCallbackQuery()
-	if (ctx.callbackQuery.data === "enter") {
+	if (ctx.callbackQuery.data === "scenes_enter") {
 		await ctx.scenes.enter("scene2")
-	} else if (ctx.callbackQuery.data === "continue") {
+	} else if (ctx.callbackQuery.data === "scene_enter") {
+		ctx.scene.enter("scene2")
+	} else if (ctx.callbackQuery.data === "resume") {
 		ctx.scene.resume()
 	}
 })
@@ -32,7 +35,9 @@ const scene2 = new Scene<BotContext>("scene2")
 
 scene2.do((ctx) => ctx.reply(`Scene 2, enter your name:`))
 scene2.wait().on("message:text", async (ctx) => {
-	await ctx.reply(`Hello, ${ctx.message.text}`)
+	await ctx.reply(
+		`Hello, ${ctx.message.text}. This is the end, you should not see Scene 1.`
+	)
 	ctx.scene.resume()
 })
 

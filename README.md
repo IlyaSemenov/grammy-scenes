@@ -160,6 +160,7 @@ The following API methods allow passing argument:
 - `ctx.scenes.resume`
 - `ctx.scene.call`
 - `ctx.scene.goto`
+- `scene.enter`
 - `scene.call`
 - `scene.goto`
 

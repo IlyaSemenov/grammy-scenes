@@ -23,30 +23,11 @@ export class SceneManager<S = unknown> {
 		return this.opts?.arg
 	}
 
-	/** Exit scene. Nested scene will return to outer scene. */
-	exit() {
-		this._want_exit = true
-	}
-	_want_exit = false
-
 	/** Break scene middleware flow, wait for new updates. */
 	wait() {
 		this._want_wait = true
 	}
 	_want_wait = false
-
-	/** Return a token that can be used later for ctx.scenes.resume() */
-	createResumeToken() {
-		const token = uuid_v4()
-		this.frame.token = token
-		return token
-	}
-
-	/** Call nested scene, then go to the next step. */
-	call(sceneId: string, arg?: any) {
-		this._want_call = { scene_id: sceneId, arg }
-	}
-	_want_call?: { scene_id: string; arg?: any }
 
 	/** This middleware must call ctx.scene.resume() to go to the next middleware. */
 	mustResume() {
@@ -65,6 +46,31 @@ export class SceneManager<S = unknown> {
 		this._want_goto = { label, arg }
 	}
 	_want_goto?: { label: string; arg?: any }
+
+	/** Exit scene. Nested scene will return to outer scene. */
+	exit() {
+		this._want_exit = true
+	}
+	_want_exit = false
+
+	/** Call nested scene, then go to the next step. */
+	call(sceneId: string, arg?: any) {
+		this._want_call = { scene_id: sceneId, arg }
+	}
+	_want_call?: { scene_id: string; arg?: any }
+
+	/** Disregard current scenes stack, switch to a new scene. */
+	enter(sceneId: string, arg?: any) {
+		this._want_enter = { scene_id: sceneId, arg }
+	}
+	_want_enter?: { scene_id: string; arg?: any }
+
+	/** Return a token that can be used later for ctx.scenes.resume() */
+	createResumeToken() {
+		const token = uuid_v4()
+		this.frame.token = token
+		return token
+	}
 }
 
 export type SceneFlavoredContext<C extends ScenesFlavoredContext, S> = C & {
