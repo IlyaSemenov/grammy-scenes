@@ -137,7 +137,7 @@ mainScene.wait().on("callback_query:data", async (ctx) => {
 mainScene.do((ctx) => ctx.reply(`Main scene finished`))
 ```
 
-### Scene argument
+### Scene/step argument
 
 ```ts
 bot.command("start", (ctx) =>
@@ -163,6 +163,15 @@ The following API methods allow passing argument:
 - `scene.enter`
 - `scene.call`
 - `scene.goto`
+- `scene.arg`
+
+You may also explicitly set argument for the next step with:
+
+```ts
+ctx.scene.next_arg = ...
+```
+
+Note that this value is transient. It is not saved to the session, and thus does not survive wait/resume cycle. Please use `ctx.scene.session` if you need that.
 
 ### Scene session context
 

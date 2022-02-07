@@ -28,6 +28,13 @@ export class Scene<
 		})
 	}
 
+	/** Set payload for ctx.scene.arg in next step */
+	arg(arg: any) {
+		this.do((ctx) => {
+			ctx.scene.next_arg = arg
+		})
+	}
+
 	/** Break scene middleware flow, wait for new updates. */
 	wait(...middleware: Array<Middleware<SceneFlavoredContext<C, S>>>) {
 		this.use((ctx) => {

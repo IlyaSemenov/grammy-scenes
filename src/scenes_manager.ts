@@ -96,6 +96,7 @@ export class ScenesManager<
 					return
 				} else if (finished) {
 					frame.pos++
+					opts = { arg: scene_manager.next_arg }
 					continue
 				} else {
 					// Middleware didn't call next() and didn't ask to wait; stop execution.

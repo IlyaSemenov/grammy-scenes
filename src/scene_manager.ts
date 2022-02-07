@@ -18,10 +18,13 @@ export class SceneManager<S = unknown> {
 		this.frame.context = value
 	}
 
-	/** Return optional payload passed to ctx.scenes.enter() or ctx.scenes.resume() */
+	/** Return optional payload passed to enter(), call(), resume(), goto(), set by arg() or next_arg */
 	get arg() {
 		return this.opts?.arg
 	}
+
+	/** Payload for ctx.scene.arg in next step */
+	next_arg: any = undefined
 
 	/** Break scene middleware flow, wait for new updates. */
 	wait() {
