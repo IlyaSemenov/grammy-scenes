@@ -77,7 +77,9 @@ export class ScenesManager<
 					opts = { arg }
 					continue
 				} else if (scene_manager._want_exit) {
-					finished = true
+					const { arg } = scene_manager._want_exit
+					opts = { arg }
+					// Do nothing - this will shift stack and continue.
 				} else if (scene_manager._want_goto) {
 					const { label, arg } = scene_manager._want_goto
 					const pos = scene.pos_by_label[label]

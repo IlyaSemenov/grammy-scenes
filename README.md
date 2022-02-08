@@ -163,6 +163,7 @@ The following API methods allow passing argument:
 - `scene.enter`
 - `scene.call`
 - `scene.goto`
+- `scene.exit`
 - `scene.arg`
 
 You may also explicitly set argument for the next step with:

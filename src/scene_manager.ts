@@ -50,11 +50,15 @@ export class SceneManager<S = unknown> {
 	}
 	_want_goto?: { label: string; arg?: any }
 
-	/** Exit scene. Nested scene will return to outer scene. */
-	exit() {
-		this._want_exit = true
+	/**
+	 * Exit scene.
+	 *
+	 * Nested scene will return to outer scene, optionally with argument.
+	 * */
+	exit(arg?: any) {
+		this._want_exit = { arg }
 	}
-	_want_exit = false
+	_want_exit?: { arg?: any }
 
 	/** Call nested scene, then go to the next step. */
 	call(sceneId: string, arg?: any) {
