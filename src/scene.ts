@@ -7,6 +7,7 @@ export class Scene<
 	C extends ScenesFlavoredContext = ScenesFlavoredContext,
 	S = undefined
 > extends Composer<SceneFlavoredContext<C, S>> {
+	_always?: Composer<SceneFlavoredContext<C, S>>
 	steps: Array<Composer<SceneFlavoredContext<C, S>>> = []
 	pos_by_label: SafeDictionary<number> = {}
 
@@ -20,12 +21,10 @@ export class Scene<
 		return composer
 	}
 
-	/** Simply put, do() is a use() which automatically calls next() */
-	do(mw: MiddlewareFn<SceneFlavoredContext<C, S>>) {
-		this.use(async (ctx, next) => {
-			await mw(ctx, async () => undefined)
-			return next()
-		})
+	always(...middleware: Array<Middleware<SceneFlavoredContext<C, S>>>) {
+		this._always ??= new Composer<SceneFlavoredContext<C, S>>()
+		this._always.use(...middleware)
+		return this._always
 	}
 
 	/** Set payload for ctx.scene.arg in next step */

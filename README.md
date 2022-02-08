@@ -277,3 +277,33 @@ onSomeExternalEvent(({ chat_id, resume_token, payload }) => {
 
 bot.start()
 ```
+
+### Run middleware before each step
+
+To run certain middleware before each step, use `scene.always()`:
+
+```ts
+import { Scene } from "grammy-scenes"
+
+import { BotContext, FooModel } from "../bot"
+
+const scene = new Scene<BotContext & { foo: FooModel }, { foo_id: number }>(
+  "main"
+)
+
+scene.always().do(async (ctx) => {
+  // Put foo into context from session
+  const foo_id = ctx.scene.session?.foo_id
+  if (foo_id) {
+    ctx.foo = await FooModel.query().findById(foo_id)
+  }
+})
+
+scene.do(async (ctx) => {
+  ctx.session = { foo_id: 123 } // Save ID to session
+})
+
+scene.wait().on("message", async (ctx) => {
+  await ctx.reply(`ctx.foo: ${ctx.foo.name}`)
+})
+```

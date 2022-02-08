@@ -1,6 +1,13 @@
+import { Composer } from "grammy"
 import { assert, SafeDictionary } from "ts-essentials"
 
-import { Scene, SceneManager, ScenesFlavoredContext, SceneStackFrame } from "."
+import {
+	Scene,
+	SceneFlavoredContext,
+	SceneManager,
+	ScenesFlavoredContext,
+	SceneStackFrame,
+} from "."
 
 /** injected as ctx.scenes */
 export class ScenesManager<
@@ -41,9 +48,16 @@ export class ScenesManager<
 			const frame = stack[0]
 			const scene = this.scenes[frame.scene]
 			assert(scene)
-			const handler = scene.steps[frame.pos]?.middleware()
+			const step_composer = scene.steps[frame.pos]
 			let finished: boolean
-			if (handler) {
+			if (step_composer) {
+				const composer = new Composer<SceneFlavoredContext<C, any>>()
+				if (scene._always) {
+					// TODO: don't run _always middleware for the next step of the same scene
+					composer.use(scene._always)
+				}
+				composer.use(step_composer)
+				const handler = composer.middleware()
 				const inner_ctx = this.ctx as any
 				const scene_manager = new SceneManager(frame, opts)
 				opts = undefined

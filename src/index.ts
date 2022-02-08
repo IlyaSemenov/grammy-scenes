@@ -1,3 +1,4 @@
+import "./monkey_patches/composer_do"
 import "./monkey_patches/composer_setup"
 import "./monkey_patches/composer_resume"
 
