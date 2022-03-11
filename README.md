@@ -156,15 +156,16 @@ mainScene.do(async (ctx) => {
 
 The following API methods allow passing argument:
 
-- `ctx.scenes.enter`
-- `ctx.scenes.resume`
-- `ctx.scene.call`
-- `ctx.scene.goto`
 - `scene.enter`
 - `scene.call`
 - `scene.goto`
 - `scene.exit`
 - `scene.arg`
+- `ctx.scenes.enter`
+- `ctx.scenes.resume`
+- `ctx.scene.call`
+- `ctx.scene.exit`
+- `ctx.scene.goto`
 
 You may also explicitly set argument for the next step with:
 

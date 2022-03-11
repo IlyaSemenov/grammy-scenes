@@ -57,6 +57,11 @@ export class Scene<
 		this.do((ctx) => ctx.scene.call(sceneId, arg))
 	}
 
+	/** Exit scene. */
+	exit(arg?: any) {
+		this.do((ctx) => ctx.scene.exit(arg))
+	}
+
 	/** Go to scene step marked with scene.label() */
 	goto(label: string, arg?: any) {
 		this.do((ctx) => ctx.scene.goto(label, arg))
