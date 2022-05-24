@@ -280,6 +280,30 @@ onSomeExternalEvent(({ chat_id, resume_token, payload }) => {
 bot.start()
 ```
 
+### Abort scenes
+
+If only part of your code uses scenes, you will possibly want to abort whatever scene is being executed on certain (or all) commands.
+
+You can do this with:
+
+```ts
+bot.command("help", async (ctx) => {
+  ctx.scenes.abort()
+  await ctx.reply("Help text")
+})
+```
+
+or you may do this universally for all commands:
+
+```ts
+bot.on("message:text", (ctx, next) => {
+  if (ctx.message.text.startsWith("/")) {
+    ctx.scenes.abort()
+  }
+  return next()
+})
+```
+
 ### Run middleware before each step
 
 To run certain middleware before each step, use `scene.always()`:

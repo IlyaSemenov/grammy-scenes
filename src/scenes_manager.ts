@@ -26,6 +26,11 @@ export class ScenesManager<
 		await this._run_stack([{ scene: sceneId, pos: 0 }], { arg })
 	}
 
+	/** Abort scenes execution */
+	async abort() {
+		delete this.ctx.session.scenes
+	}
+
 	/** Resume scene if it's still on the same step */
 	async resume(token: string, arg?: unknown) {
 		const stack = this.ctx.session.scenes?.stack
