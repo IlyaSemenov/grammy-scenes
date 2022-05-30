@@ -12,11 +12,11 @@ yarn add grammy-scenes
 
 ```ts
 import { Bot, Context, session, SessionFlavor } from "grammy"
-import { SceneSessionFlavor, ScenesFlavor } from "grammy-scenes"
+import { ScenesSessionFlavor, ScenesFlavor } from "grammy-scenes"
 
 import { scenes } from "./scenes"
 
-type SessionData = SceneSessionFlavor & {
+type SessionData = ScenesSessionFlavor & {
   // Your own global session interface, could be empty as well.
 }
 
