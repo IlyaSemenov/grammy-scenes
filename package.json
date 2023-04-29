@@ -14,8 +14,7 @@
   "source": "src/index.ts",
   "files": [
     "dist",
-    "src",
-    "!**/*.test.*"
+    "src"
   ],
   "scripts": {
     "build": "tsup",
