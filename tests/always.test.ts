@@ -2,42 +2,34 @@
 
 > /start
 
-Send me something.
+Context correct: true. Now send me something.
 
-> anything
+> test
 
-Context data is "important" (should be "important")
+Context correct: true
 
 */
 
 import { Scene } from "grammy-scenes"
-import { assert } from "ts-essentials"
 
 import { BotContext, create_bot } from "./lib/bot"
 
-const scene = new Scene<BotContext & { foo: string }, string>("main")
+const scene = new Scene<BotContext & { foo: string }>("main")
 
 const important_value = "important"
 
-scene.do((ctx) => {
-	ctx.scene.session = important_value
-})
-
 scene.always().do((ctx) => {
-	// TODO: make this assert work?
-	// assert(ctx.scene.session)
-	ctx.foo = ctx.scene.session
+	ctx.foo = important_value
 })
 
 scene.do(async (ctx) => {
-	assert(ctx.foo === important_value)
-	await ctx.reply("Send me something.")
+	await ctx.reply(
+		`Context correct: ${ctx.foo === important_value}. Now send me something.`
+	)
 })
 
 scene.wait().on("message", async (ctx) => {
-	await ctx.reply(
-		`Context data is "${ctx.foo}" (should be "${important_value}")`
-	)
+	await ctx.reply(`Context correct: ${ctx.foo === important_value}`)
 	ctx.scene.resume()
 })
 
