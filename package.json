@@ -22,7 +22,7 @@
   "scripts": {
     "build": "tsup",
     "prepack": "npm run build",
-    "lint": "eslint --fix '**/*.{cjs,js,ts}'",
+    "lint": "eslint --fix '**/*.{cjs,js,ts}' && prettier --write '**/*.json'",
     "prepare": "husky install",
     "test": "npm run test:types",
     "test:types": "tsc --noEmit",
