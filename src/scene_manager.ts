@@ -26,19 +26,19 @@ export class SceneManager<S = unknown> {
 	/** Payload for ctx.scene.arg in next step */
 	next_arg: any = undefined
 
-	/** Break scene middleware flow, wait for new updates. */
-	wait() {
+	/** Break scene flow, wait for new updates. */
+	_wait() {
 		this._want_wait = true
 	}
 	_want_wait = false
 
 	/** This middleware must call ctx.scene.resume() to go to the next middleware. */
-	mustResume() {
-		this._must_resume = true
+	_must_resume() {
+		this._want_must_resume = true
 	}
-	_must_resume = false
+	_want_must_resume = false
 
-	/** Go to the next middleware after this one completes. Used after ctx.scenes.wait() or ctx.scene.mustResume() */
+	/** Go to the next middleware after this one completes. Used to proceed after wait() */
 	resume() {
 		this._want_resume = true
 	}
