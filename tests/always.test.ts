@@ -1,3 +1,15 @@
+/*
+
+> /start
+
+Send me something.
+
+> anything
+
+Context data is "important" (should be "important")
+
+*/
+
 import { Scene } from "grammy-scenes"
 import { assert } from "ts-essentials"
 
@@ -5,8 +17,10 @@ import { BotContext, create_bot } from "./lib/bot"
 
 const scene = new Scene<BotContext & { foo: string }, string>("main")
 
+const important_value = "important"
+
 scene.do((ctx) => {
-	ctx.scene.session = "foo"
+	ctx.scene.session = important_value
 })
 
 scene.always().do((ctx) => {
@@ -16,13 +30,14 @@ scene.always().do((ctx) => {
 })
 
 scene.do(async (ctx) => {
-	assert(ctx.foo === "foo")
+	assert(ctx.foo === important_value)
 	await ctx.reply("Send me something.")
 })
 
 scene.wait().on("message", async (ctx) => {
-	assert(ctx.foo === "foo")
-	console.log("All OK!")
+	await ctx.reply(
+		`Context data is "${ctx.foo}" (should be "${important_value}")`
+	)
 	ctx.scene.resume()
 })
 

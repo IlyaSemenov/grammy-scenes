@@ -1,4 +1,18 @@
-// This test repeats the introduction example from README.md
+/*
+
+> /start
+
+Enter your name:
+
+> hacker
+
+hacker, your are not welcome here.
+
+> john
+
+Welcome, john!
+
+*/
 
 import { Scene } from "grammy-scenes"
 

@@ -1,3 +1,25 @@
+/*
+
+> /start
+
+Starting job...
+
+> Hello
+
+Please wait until the job is done.
+
+Job finished: All OK
+
+Enter your name
+
+> Peter
+
+Welcome, Peter
+
+Finished
+
+*/
+
 import { Scene } from "grammy-scenes"
 
 import { BotContext, create_bot } from "./lib/bot"

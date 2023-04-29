@@ -1,3 +1,53 @@
+/*
+
+> /start
+
+Welcome to Main Scene
+
+First captcha is obligatory
+
+You must solve captcha !
+
+Enter the letters you see below: (a)
+
+> b
+
+Try again!
+
+> a
+
+Captcha solved!
+
+You are not lucky, you must solve second captcha
+
+You must solve captcha !
+
+Enter the letters you see below: (a)
+
+Captcha solved!
+
+Do you want to try your luck once again?
+
+> YES
+
+You are not lucky, you must solve second captcha
+
+You must solve captcha !
+
+Enter the letters you see below: (a)
+
+> a
+
+Captcha solved!
+
+Do you want to try your luck once again?
+
+> NO
+
+Main scene finished
+
+*/
+
 import { Scene } from "grammy-scenes"
 
 import { BotContext, create_bot } from "./lib/bot"

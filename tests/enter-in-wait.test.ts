@@ -1,3 +1,39 @@
+/*
+
+> /start
+
+Please choose:
+
+> await scenes.enter
+
+Scene 2, enter your name:
+
+> John
+
+Hello, John. This is the end, you should not see Scene 1.
+
+> /start
+
+Please choose:
+
+> scenes.ente
+
+Scene 2, enter your name:
+
+> Peter
+
+Hello, Peter. This is the end, you should not see Scene 1.
+
+> /start
+
+Please choose:
+
+> Resume this scene
+
+Scene 1 complete
+
+*/
+
 import { Scene } from "grammy-scenes"
 
 import { BotContext, create_bot } from "./lib/bot"

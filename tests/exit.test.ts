@@ -1,3 +1,21 @@
+/*
+
+> /start
+
+Proceed or Exit?
+
+> Proceed
+
+Step 1
+
+Step 2
+
+> /start
+
+Exit
+
+*/
+
 import { Scene } from "grammy-scenes"
 
 import { BotContext, create_bot } from "./lib/bot"

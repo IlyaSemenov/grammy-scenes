@@ -1,3 +1,11 @@
+/*
+
+> /start
+
+Test passed
+
+*/
+
 import { Scene } from "grammy-scenes"
 import { assert } from "ts-essentials"
 
