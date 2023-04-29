@@ -4,8 +4,8 @@
 
 ## Install
 
-```
-yarn add grammy-scenes
+```sh
+npm i grammy-scenes
 ```
 
 ## Use

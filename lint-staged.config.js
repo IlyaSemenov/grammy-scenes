@@ -1,3 +1,3 @@
-module.exports = {
-	"*.{js,ts}": "eslint --fix",
+export default {
+	"*.{cjs,js,ts}": "eslint --fix",
 }
