@@ -17,8 +17,9 @@ export async function create_bot<C extends BotContext>(
 ) {
 	const scenes_composer = new ScenesComposer<C>(...scenes)
 
-	const is_manual_run = !!process.env.BOT_TOKEN
-	const bot = new Bot<C>(process.env.BOT_TOKEN || "invalid")
+	const token = import.meta.env.BOT_TOKEN
+	const is_manual_run = !!token
+	const bot = new Bot<C>(token || "invalid")
 	bot.use(
 		session({
 			type: "multi",
@@ -41,6 +42,11 @@ export async function create_bot<C extends BotContext>(
 		await bot.init()
 		console.log(`Bot @${bot.botInfo.username} started.`)
 		bot.start()
+		if (import.meta.hot) {
+			import.meta.hot.on("vite:beforeFullReload", async () => {
+				await bot.stop()
+			})
+		}
 	}
 
 	return bot

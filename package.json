@@ -24,7 +24,7 @@
     "prepare": "husky install",
     "test": "npm run test:types",
     "test:types": "tsc --noEmit",
-    "dev": "NODE_OPTIONS='-r dotenv/config' nodemon --exec esr"
+    "dev": "vite-node --watch"
   },
   "dependencies": {
     "ts-essentials": "^9.1.0",
@@ -42,13 +42,11 @@
   "devDependencies": {
     "@commitlint/cli": "^15.0.0",
     "@commitlint/config-conventional": "^15.0.0",
-    "@tsconfig/node14": "^1.0.1",
+    "@tsconfig/node18": "~2.0.0",
+    "@types/node": "~18.16.3",
     "@types/uuid": "^8.3.3",
     "@typescript-eslint/eslint-plugin": "^5.8.0",
     "@typescript-eslint/parser": "^5.8.0",
-    "dotenv": "^14.1.0",
-    "esbuild": "^0.14.8",
-    "esbuild-runner": "^2.2.1",
     "eslint": "^8.5.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -57,9 +55,11 @@
     "grammy-pseudo-update": "^3.0.0",
     "husky": ">=6",
     "lint-staged": ">=10",
-    "nodemon": "^2.0.15",
     "prettier": "^2.1.2",
     "tsup": "^5.11.9",
-    "typescript": "^4.0.5"
+    "typescript": "^4.0.5",
+    "vite": "~4.3.3",
+    "vite-node": "~0.30.1",
+    "vite-tsconfig-paths": "~4.2.0"
   }
 }
