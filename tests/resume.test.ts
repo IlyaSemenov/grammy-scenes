@@ -32,6 +32,7 @@ interface Job {
 const jobs: Job[] = []
 
 const scene = new Scene<BotContext>("main")
+
 scene.do(async (ctx) => {
 	const resume_token = ctx.scene.createResumeToken()
 	await ctx.reply(`Starting job...`)
@@ -39,6 +40,7 @@ scene.do(async (ctx) => {
 		jobs.push({ chat_id: ctx.chat!.id, resume_token })
 	}, 500)
 })
+
 scene.wait().setup((scene) => {
 	scene.resume(async (ctx) => {
 		await ctx.reply(`Job finished: ${ctx.scene.arg}`)
