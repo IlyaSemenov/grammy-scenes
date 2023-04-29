@@ -13,7 +13,7 @@ specifiers:
   eslint-plugin-prettier: ~4.2.1
   eslint-plugin-simple-import-sort: ~10.0.0
   grammy: ~1.16.0
-  grammy-pseudo-update: ^3.0.0
+  grammy-pseudo-update: ^3.0.1
   husky: ~8.0.3
   lint-staged: ~13.2.2
   prettier: ~2.8.8
@@ -42,7 +42,7 @@ devDependencies:
   eslint-plugin-prettier: 4.2.1_5pokp25ua6t5ubushhw3tqituq
   eslint-plugin-simple-import-sort: 10.0.0_eslint@8.39.0
   grammy: 1.16.0
-  grammy-pseudo-update: 3.0.0_grammy@1.16.0
+  grammy-pseudo-update: 3.0.1_grammy@1.16.0
   husky: 8.0.3
   lint-staged: 13.2.2
   prettier: 2.8.8
@@ -1617,8 +1617,8 @@ packages:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
     dev: true
 
-  /grammy-pseudo-update/3.0.0_grammy@1.16.0:
-    resolution: {integrity: sha512-fRQo2QeY4mnhcrNCeC+IdG3pRPA7aLfhdfEgmYoqifetZs47/cdHNcynaP/hPqhjtkd0ZHmjKM/jILLHSnCF0w==}
+  /grammy-pseudo-update/3.0.1_grammy@1.16.0:
+    resolution: {integrity: sha512-OoYc9ZpXoYWmWflq7QyXacHs87QrLasgP4NkP534M6UAsC6dsjxwxnbR0pm9G7P+sD4Dd5rWnIgCm89CrVqs2g==}
     peerDependencies:
       grammy: ^1.5.4
     dependencies:
