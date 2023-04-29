@@ -15,7 +15,7 @@ specifiers:
   eslint-config-prettier: ^8.3.0
   eslint-plugin-prettier: ^4.0.0
   eslint-plugin-simple-import-sort: ^7.0.0
-  grammy: ^1.5.4
+  grammy: ~1.16.0
   grammy-pseudo-update: ^3.0.0
   husky: '>=6'
   lint-staged: '>=10'
@@ -46,8 +46,8 @@ devDependencies:
   eslint-config-prettier: 8.3.0_eslint@8.5.0
   eslint-plugin-prettier: 4.0.0_stq3nu6on2urnbdrejysk4hjvy
   eslint-plugin-simple-import-sort: 7.0.0_eslint@8.5.0
-  grammy: 1.5.4
-  grammy-pseudo-update: 3.0.0_grammy@1.5.4
+  grammy: 1.16.0
+  grammy-pseudo-update: 3.0.0_grammy@1.16.0
   husky: 7.0.4
   lint-staged: 12.1.4
   nodemon: 2.0.15
@@ -428,8 +428,8 @@ packages:
       - supports-color
     dev: true
 
-  /@grammyjs/types/2.4.5:
-    resolution: {integrity: sha512-1n7Q+dyNLahYrDIMSTSrCgdN1+NPNbK/dL4mDOEWFinG0cJKeu509uqqHe6CNABOfaKcbujxVEqBL/DufYptOQ==}
+  /@grammyjs/types/3.1.1:
+    resolution: {integrity: sha512-nTNYvk+Al/nXZAMTEzPYEyW6pfgYgNuf/gxfx17kCxjHpAYhV+pcmROuD9eOBDLaBDh/hZJkQTIY6S3CfTAC0Q==}
     dev: true
 
   /@humanwhocodes/config-array/0.9.2:
@@ -1261,6 +1261,18 @@ packages:
       supports-color: 9.2.1
     dev: true
 
+  /debug/4.3.4:
+    resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
+    engines: {node: '>=6.0'}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+    dependencies:
+      ms: 2.1.2
+    dev: true
+
   /decamelize-keys/1.1.0:
     resolution: {integrity: sha512-ocLWuYzRPoS9bfiSdDd3cxvrzovVMZnRDVEzAs+hWIVXGDbHxWMECij2OBuyB/An0FFW/nLuq6Kv1i/YC5Qfzg==}
     engines: {node: '>=0.10.0'}
@@ -2086,23 +2098,24 @@ packages:
     resolution: {integrity: sha512-NtNxqUcXgpW2iMrfqSfR73Glt39K+BLwWsPs94yR63v45T0Wbej7eRmL5cWfwEgqXnmjQp3zaJTshdRW/qC2ZQ==}
     dev: true
 
-  /grammy-pseudo-update/3.0.0_grammy@1.5.4:
+  /grammy-pseudo-update/3.0.0_grammy@1.16.0:
     resolution: {integrity: sha512-fRQo2QeY4mnhcrNCeC+IdG3pRPA7aLfhdfEgmYoqifetZs47/cdHNcynaP/hPqhjtkd0ZHmjKM/jILLHSnCF0w==}
     peerDependencies:
       grammy: ^1.5.4
     dependencies:
-      grammy: 1.5.4
+      grammy: 1.16.0
     dev: true
 
-  /grammy/1.5.4:
-    resolution: {integrity: sha512-maTeLcuDJNU7leLMPO8MoE5Hd4HjMzSkozHrLKe4SXa4f0/QZyWjvckRgFnCWtkzkuWEAoWYleUYeCSdJr0HdA==}
+  /grammy/1.16.0:
+    resolution: {integrity: sha512-qy9ZWBpV3CsbXjcxX2c2gJtpRIpaIeGweb51Od1cg0G8CapZTS3Y8gTUzd0OgDSy+2kUvuliTHPjs+843Ltc2g==}
     engines: {node: ^12.20.0 || >=14.13.1}
     dependencies:
-      '@grammyjs/types': 2.4.5
+      '@grammyjs/types': 3.1.1
       abort-controller: 3.0.0
-      debug: 4.3.3
-      node-fetch: 2.6.6
+      debug: 4.3.4
+      node-fetch: 2.6.9
     transitivePeerDependencies:
+      - encoding
       - supports-color
     dev: true
 
@@ -2835,9 +2848,14 @@ packages:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: true
 
-  /node-fetch/2.6.6:
-    resolution: {integrity: sha512-Z8/6vRlTUChSdIgMa51jxQ4lrw/Jy5SOW10ObaA47/RElsAN2c5Pn8bTgFGWn/ibwzXTE8qwr1Yzx28vsecXEA==}
+  /node-fetch/2.6.9:
+    resolution: {integrity: sha512-DJm/CJkZkRjKKj4Zi4BsKVZh3ValV5IR5s7LVZnW+6YMh0W1BfNA8XSs6DLMGYlId5F3KnA70uu2qepcR08Qqg==}
     engines: {node: 4.x || >=6.0.0}
+    peerDependencies:
+      encoding: ^0.1.0
+    peerDependenciesMeta:
+      encoding:
+        optional: true
     dependencies:
       whatwg-url: 5.0.0
     dev: true

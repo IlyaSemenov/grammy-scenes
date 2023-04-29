@@ -30,6 +30,14 @@ bot.use(
   })
 )
 
+// or:
+bot.use(
+  session({
+    type: "multi",
+    scenes: {},
+  })
+)
+
 // Inject ctx.scenes
 bot.use(scenes.manager())
 

@@ -28,7 +28,7 @@ export class ScenesManager<
 
 	/** Abort scenes execution */
 	async abort() {
-		delete this.ctx.session.scenes
+		this.ctx.session.scenes = undefined
 	}
 
 	/** Resume scene if it's still on the same step */
@@ -47,7 +47,7 @@ export class ScenesManager<
 		//
 		// Deleting the stack earlier rather than on demand allows to handle cases
 		// such as entering a different scenes without finishing the first one.
-		delete this.ctx.session.scenes
+		this.ctx.session.scenes = undefined
 
 		while (stack[0]) {
 			const frame = stack[0]

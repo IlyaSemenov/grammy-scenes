@@ -19,7 +19,12 @@ export async function create_bot<C extends BotContext>(
 
 	const is_manual_run = !!process.env.BOT_TOKEN
 	const bot = new Bot<C>(process.env.BOT_TOKEN || "invalid")
-	bot.use(session({ initial: () => ({}) }))
+	bot.use(
+		session({
+			type: "multi",
+			scenes: {},
+		})
+	)
 	if (is_manual_run) {
 		bot.use(async (ctx, next) => {
 			await next()
