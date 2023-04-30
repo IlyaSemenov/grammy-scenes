@@ -80,15 +80,12 @@ import { BotContext } from "../bot"
 
 export const mainScene = new Scene<BotContext>("main")
 
-// Define scene flow with middlewares.
-// Make sure you call next() or the scene will stop.
-mainScene.use(async (ctx, next) => {
+// Define scene flow with steps.
+mainScene.step(async (ctx) => {
   await ctx.reply("Entering main scene...")
-  return next()
 })
 
-// do() is a shortcut for use() which automatically calls next()
-mainScene.do(async (ctx) => {
+mainScene.step(async (ctx) => {
   await ctx.reply("Enter your name:")
 })
 
@@ -109,7 +106,7 @@ mainScene.wait().on("message:text", async (ctx) => {
 })
 
 // Add more steps...
-mainScene.do(async (ctx) => {
+mainScene.step(async (ctx) => {
   await ctx.reply("Proceeding...")
 })
 
@@ -120,7 +117,7 @@ mainScene.label("start")
 // See sample captcha implementation below.
 mainScene.call("captcha")
 
-mainScene.do(async (ctx) => {
+mainScene.step(async (ctx) => {
   await ctx.reply(`Please choose:`, {
     reply_markup: {
       inline_keyboard: [
@@ -150,7 +147,7 @@ mainScene.wait().on("callback_query:data", async (ctx) => {
   }
 })
 
-mainScene.do((ctx) => ctx.reply(`Main scene finished`))
+mainScene.step((ctx) => ctx.reply(`Main scene finished`))
 ```
 
 ### Scene/step argument
@@ -165,7 +162,7 @@ bot.command("start", (ctx) =>
   )
 )
 
-mainScene.do(async (ctx) => {
+mainScene.step(async (ctx) => {
   await ctx.reply(`Enter your name, ${ctx.scene.arg?.title || "mortal"}:`)
 })
 ```
@@ -203,7 +200,7 @@ import { generateCaptcha } from "some-captcha-module"
 import { BotContext } from "../bot"
 
 const captchaScene = new Scene<BotContext, { secret: string }>("captcha")
-captchaScene.do(async (ctx) => {
+captchaScene.step(async (ctx) => {
   const { secret, image } = await generateCaptcha()
   ctx.scene.session = { secret }
   await ctx.reply(`Enter the letters you see below:`)
@@ -236,7 +233,7 @@ import { Scene } from "grammy-scenes"
 import { BotContext } from "../bot"
 
 const jobScene = new Scene<BotContext>("job")
-jobScene.do(async (ctx) => {
+jobScene.step(async (ctx) => {
   await ctx.reply(`Starting job...`)
   const token = ctx.scene.createNotifyToken()
   startJob({ chat_id: ctx.chat!.id, token })
@@ -341,7 +338,7 @@ scene.always().do(async (ctx) => {
   }
 })
 
-scene.do((ctx) => {
+scene.step((ctx) => {
   ctx.scene.session = { foo_id: 123 } // Save ID to session
 })
 

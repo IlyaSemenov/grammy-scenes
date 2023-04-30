@@ -22,7 +22,7 @@ scene.always().do((ctx) => {
 	ctx.foo = important_value
 })
 
-scene.do(async (ctx) => {
+scene.step(async (ctx) => {
 	await ctx.reply(
 		`Context correct: ${ctx.foo === important_value}. Now send me something.`
 	)

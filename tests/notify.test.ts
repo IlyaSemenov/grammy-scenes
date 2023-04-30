@@ -33,7 +33,7 @@ const jobs: Job[] = []
 
 const scene = new Scene<BotContext>("main")
 
-scene.do(async (ctx) => {
+scene.step(async (ctx) => {
 	const token = ctx.scene.createNotifyToken()
 	await ctx.reply(`Starting job...`)
 	setTimeout(() => {
@@ -51,7 +51,7 @@ scene.wait().setup((scene) => {
 	})
 })
 
-scene.do((ctx) => ctx.reply("Enter your name"))
+scene.step((ctx) => ctx.reply("Enter your name"))
 
 scene.wait().setup((scene) => {
 	scene.onNotify(async (ctx) => {
@@ -64,7 +64,7 @@ scene.wait().setup((scene) => {
 	})
 })
 
-scene.do((ctx) => ctx.reply("Finished"))
+scene.step((ctx) => ctx.reply("Finished"))
 
 create_bot([scene], (bot) => {
 	setInterval(() => {

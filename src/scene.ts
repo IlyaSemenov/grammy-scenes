@@ -24,17 +24,10 @@ export class Scene<
 	/**
 	 * Add a scene step.
 	 */
-	use(...middleware: Array<MiddlewareFn<SceneFlavoredContext<C, S>>>) {
+	step(...middleware: Array<MiddlewareFn<SceneFlavoredContext<C, S>>>) {
 		const step = new StepComposer<SceneFlavoredContext<C, S>, S>(...middleware)
 		this._steps.push(step)
 		return step
-	}
-
-	/**
-	 * Add a scene step which will always call the next step (unless explicitly aborted).
-	 */
-	do(middleware: MiddlewareFn<SceneFlavoredContext<C, S>>) {
-		return this.use().do(middleware)
 	}
 
 	/**
@@ -63,31 +56,31 @@ export class Scene<
 	 * ```
 	 */
 	wait() {
-		this.use((ctx) => {
+		this.step((ctx) => {
 			ctx.scene._wait()
 		})
-		return this.do((ctx) => {
+		return this.step().do((ctx) => {
 			ctx.scene._must_resume()
 		})
 	}
 
 	/** Set payload for ctx.scene.arg in next step */
 	arg(arg: any) {
-		return this.use().arg(arg)
+		return this.step().arg(arg)
 	}
 
 	/** Call nested scene, then go to the next step. */
 	call(sceneId: string, arg?: any) {
-		this.use().call(sceneId, arg)
+		this.step().call(sceneId, arg)
 	}
 
 	/** Exit scene. */
 	exit(arg?: any) {
-		this.use().exit(arg)
+		this.step().exit(arg)
 	}
 
 	/** Go to named step. */
 	goto(name: string, arg?: any) {
-		this.use().goto(name, arg)
+		this.step().goto(name, arg)
 	}
 }

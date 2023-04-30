@@ -54,27 +54,22 @@ export class ScenesManager<
 			const step = scene._steps[frame.pos]
 			// TODO: distinguish case where missing step is caused by invalid session data vs. normal scene finish.
 			if (step) {
-				let finished: boolean
 				const composer = new Composer<SceneFlavoredContext<C, any>>()
 				if (scene._always) {
 					// TODO: don't run _always middleware for the next step of the same scene
 					composer.use(scene._always)
 				}
 				composer.use(step)
-				const handler = composer.middleware()
+				const step_mw = composer.middleware()
 				const inner_ctx = this.ctx as any
 				const scene_manager = new SceneManager(frame, opts)
 				opts = undefined
 				inner_ctx.scene = scene_manager
 				try {
-					finished = false
-					await handler(inner_ctx, async () => {
-						finished = true
-					})
+					await step_mw(inner_ctx, async () => undefined)
 				} finally {
 					delete inner_ctx.scene
 				}
-
 				if (scene_manager._want_enter) {
 					// Replace stack with new scene.
 					const { scene_id, arg } = scene_manager._want_enter
@@ -120,14 +115,11 @@ export class ScenesManager<
 					frame.pos++
 					this.ctx.session.scenes ??= { stack }
 					return
-				} else if (finished) {
-					// Middleware called next(), thus proceed to next step.
+				} else {
+					// Nothing interesting happened. Proceed to next step.
 					frame.pos++
 					opts = { arg: scene_manager.next_arg }
 					continue
-				} else {
-					// Middleware didn't call next() and didn't ask to wait; stop execution.
-					return
 				}
 			}
 			stack.shift()

@@ -20,15 +20,12 @@ import { BotContext, create_bot } from "./lib/bot"
 
 const mainScene = new Scene<BotContext>("main")
 
-// Define scene flow with middlewares.
-// Make sure you call next() or the scene will stop.
-mainScene.use(async (ctx, next) => {
+// Define scene flow with steps.
+mainScene.step(async (ctx) => {
 	await ctx.reply("Entering main scene...")
-	return next()
 })
 
-// do() is a shortcut for use() which automatically calls next()
-mainScene.do(async (ctx) => {
+mainScene.step(async (ctx) => {
 	await ctx.reply("Enter your name:")
 })
 

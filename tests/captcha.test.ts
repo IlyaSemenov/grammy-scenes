@@ -53,7 +53,7 @@ import { Scene } from "grammy-scenes"
 import { BotContext, create_bot } from "./lib/bot"
 
 const captcha_scene = new Scene<BotContext, { secret: string }>("captcha")
-captcha_scene.do(async (ctx) => {
+captcha_scene.step(async (ctx) => {
 	await ctx.reply(
 		`You must solve captcha ${ctx.scene.arg?.again ? ` again` : ``}!`
 	)
@@ -71,19 +71,19 @@ captcha_scene.wait().setup((scene) => {
 	})
 	scene.on("message:sticker", (ctx) => ctx.reply("No stickers please."))
 })
-captcha_scene.do((ctx) => ctx.reply("Captcha solved!"))
+captcha_scene.step((ctx) => ctx.reply("Captcha solved!"))
 
 const welcome_scene = new Scene("welcome")
-welcome_scene.do((ctx) =>
+welcome_scene.step((ctx) =>
 	ctx.reply(`Welcome to ${ctx.scene.arg?.name || "scene"}`)
 )
 
 const main_scene = new Scene("main")
 main_scene.call("welcome", { name: "Main Scene" })
-main_scene.do((ctx) => ctx.reply("First captcha is obligatory"))
+main_scene.step((ctx) => ctx.reply("First captcha is obligatory"))
 main_scene.call("captcha")
 main_scene.label("captcha")
-main_scene.do(async (ctx) => {
+main_scene.step(async (ctx) => {
 	if (Math.random() < 0.3) {
 		await ctx.reply("You are lucky, no second captcha")
 	} else {
@@ -91,7 +91,7 @@ main_scene.do(async (ctx) => {
 		ctx.scene.call("captcha")
 	}
 })
-main_scene.do(async (ctx) => {
+main_scene.step(async (ctx) => {
 	await ctx.reply(`Do you want to try your luck once again?`, {
 		reply_markup: {
 			inline_keyboard: [
@@ -111,6 +111,6 @@ main_scene.wait().on("callback_query:data", async (ctx) => {
 		ctx.scene.resume()
 	}
 })
-main_scene.do((ctx) => ctx.reply(`Main scene finished`))
+main_scene.step((ctx) => ctx.reply(`Main scene finished`))
 
 create_bot([main_scene, captcha_scene, welcome_scene])

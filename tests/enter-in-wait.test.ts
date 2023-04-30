@@ -40,7 +40,7 @@ import { BotContext, create_bot } from "./lib/bot"
 
 const scene1 = new Scene<BotContext>("main")
 
-scene1.do(async (ctx) => {
+scene1.step(async (ctx) => {
 	await ctx.reply(`Please choose:`, {
 		reply_markup: {
 			inline_keyboard: [
@@ -65,11 +65,11 @@ scene1.wait().on("callback_query:data", async (ctx) => {
 	}
 })
 
-scene1.do((ctx) => ctx.reply(`Scene 1 complete`))
+scene1.step((ctx) => ctx.reply(`Scene 1 complete`))
 
 const scene2 = new Scene<BotContext>("scene2")
 
-scene2.do((ctx) => ctx.reply(`Scene 2, enter your name:`))
+scene2.step((ctx) => ctx.reply(`Scene 2, enter your name:`))
 scene2.wait().on("message:text", async (ctx) => {
 	await ctx.reply(
 		`Hello, ${ctx.message.text}. This is the end, you should not see Scene 1.`
