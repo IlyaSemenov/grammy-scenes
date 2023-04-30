@@ -3,6 +3,9 @@ import { assert, SafeDictionary } from "ts-essentials"
 
 import { Scene, ScenesFlavoredContext, ScenesManager } from "."
 
+/**
+ * Top-level collection of scenes.
+ */
 export class ScenesComposer<C extends ScenesFlavoredContext>
 	implements MiddlewareObj<C>
 {
