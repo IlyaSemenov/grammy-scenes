@@ -118,7 +118,7 @@ export class ScenesManager<
 					for (const frame of full_stack) {
 						if (frame.pos !== undefined) {
 							console.warn(
-								`Saving scenes stack with unnamed steps is discouraged! Please add .label() for step ${frame.pos} in scene ${frame.scene}.`
+								`Saving scenes stack with unlabeled steps is discouraged! Please add .label() for step ${frame.pos} in scene ${frame.scene}.`
 							)
 						}
 					}

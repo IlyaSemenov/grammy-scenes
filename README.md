@@ -92,7 +92,7 @@ mainScene.step(async (ctx) => {
 // As the flow comes to wait(), the execution will stop.
 // Next Telegram updates will be passed to the inner middleware.
 // The inner middleware should call ctx.scene.resume() to proceed to the next scene step.
-// Make sure to use unique name in each wait() block.
+// Make sure to use unique label in each wait() block.
 mainScene.wait("name").on("message:text", async (ctx) => {
   const name = ctx.message.text
   if (name.toLowerCase() === "john") {
