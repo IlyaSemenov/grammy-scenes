@@ -40,27 +40,28 @@ export class ScenesManager<
 	}
 
 	async _run_stack(stack: SceneStackFrame[], opts?: SceneRunOpts) {
-		// By default, delete the stack from the session.
-		// Re-save it explicitly if ctx.scene._wait() was called.
+		// By default, delete the stack from the session. Re-save it explicitly in two cases:
+		//
+		// 1) ctx.scene.wait()
+		// 2) ctx.scene.mustResume() without ctx.scene.resume()
+		//
+		// Deleting the stack earlier rather than on demand allows to handle cases
+		// such as entering a different scenes without finishing the first one.
 		this.ctx.session.scenes = undefined
 
 		while (stack[0]) {
 			const frame = stack[0]
 			const scene = this.scenes[frame.scene]
-			if (!scene) {
-				// Invalid session data - abort.
-				return
-			}
-			const step = scene._steps[frame.pos]
-			// TODO: distinguish case where missing step is caused by invalid session data vs. normal scene finish.
-			if (step) {
-				let finished: boolean
+			assert(scene)
+			const step_composer = scene.steps[frame.pos]
+			let finished: boolean
+			if (step_composer) {
 				const composer = new Composer<SceneFlavoredContext<C, any>>()
 				if (scene._always) {
 					// TODO: don't run _always middleware for the next step of the same scene
 					composer.use(scene._always)
 				}
-				composer.use(step)
+				composer.use(step_composer)
 				const handler = composer.middleware()
 				const inner_ctx = this.ctx as any
 				const scene_manager = new SceneManager(frame, opts)
@@ -76,20 +77,17 @@ export class ScenesManager<
 				}
 
 				if (scene_manager._want_enter) {
-					// Replace stack with new scene.
 					const { scene_id, arg } = scene_manager._want_enter
 					stack = [{ scene: scene_id, pos: 0 }]
 					opts = { arg }
 					continue
 				} else if (scene_manager._want_exit) {
-					// Exit current scene.
 					const { arg } = scene_manager._want_exit
 					opts = { arg }
-					// Do nothing - this will shift stack and continue to outer scene.
+					// Do nothing - this will shift stack and continue.
 				} else if (scene_manager._want_goto) {
-					// Goto step inside current scene
 					const { label, arg } = scene_manager._want_goto
-					const pos = scene._pos_by_label[label]
+					const pos = scene.pos_by_label[label]
 					assert(
 						pos !== undefined,
 						`Scene ${scene.id} doesn't have label ${label}.`
@@ -98,30 +96,26 @@ export class ScenesManager<
 					opts = { arg }
 					continue
 				} else if (scene_manager._want_call) {
-					// FIXME: need to save named position here.
 					const { scene_id, arg } = scene_manager._want_call
 					frame.pos++
 					stack.unshift({ scene: scene_id, pos: 0 })
 					opts = { arg }
 					continue
-				} else if (scene_manager._want_must_resume) {
+				} else if (scene_manager._must_resume) {
 					if (scene_manager._want_resume) {
 						delete frame.token
 						frame.pos++
 						continue
 					} else {
-						// ctx.scene.resume() was not called - save session and abort.
-						// FIXME: need to save named position here.
+						// wait handler didn't ask to resume
 						this.ctx.session.scenes ??= { stack }
 						return
 					}
 				} else if (scene_manager._want_wait) {
-					// FIXME: need to save named position here.
 					frame.pos++
 					this.ctx.session.scenes ??= { stack }
 					return
 				} else if (finished) {
-					// Middleware called next(), thus proceed to next step.
 					frame.pos++
 					opts = { arg: scene_manager.next_arg }
 					continue

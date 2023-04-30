@@ -4,8 +4,8 @@
 
 ## Install
 
-```sh
-npm i grammy-scenes
+```
+yarn add grammy-scenes
 ```
 
 ## Use
@@ -80,22 +80,19 @@ import { BotContext } from "../bot"
 
 export const mainScene = new Scene<BotContext>("main")
 
-// Define scene flow with middlewares.
-// Make sure you call next() or the scene will stop.
-mainScene.use(async (ctx, next) => {
-  await ctx.reply("Entering main scene...")
+// Scene extends Composer, so you may use all methods such as .use() .on() etc.
+mainScene.use((ctx, next) => {
+  console.log("Entering main scene...")
   return next()
 })
 
-// do() is a shortcut for use() which automatically calls next()
+// Simply put, do() is a use() which automatically calls next()
 mainScene.do(async (ctx) => {
-  await ctx.reply("Enter your name:")
+  await ctx.reply(`Enter your name:`)
 })
 
-// As the flow comes to wait(), the execution will stop.
-// Next Telegram updates will be passed to the inner middleware.
+// As the flow comes to wait() middleware, the execution will stop and next Telegram updates will be passed to the inner middleware.
 // The inner middleware should call ctx.scene.resume() to proceed to the next scene step.
-// Make sure to use unique name in each wait() block.
 mainScene.wait().on("message:text", async (ctx) => {
   const name = ctx.message.text
   if (name.toLowerCase() === "john") {
@@ -106,11 +103,6 @@ mainScene.wait().on("message:text", async (ctx) => {
     // Keep the execution in the current wait() block.
     await ctx.reply(`${name}, your are not welcome here.`)
   }
-})
-
-// Add more steps...
-mainScene.do(async (ctx) => {
-  await ctx.reply("Proceeding...")
 })
 
 // Mark position in the scene to be able to jump to it (see below).
@@ -341,8 +333,8 @@ scene.always().do(async (ctx) => {
   }
 })
 
-scene.do((ctx) => {
-  ctx.scene.session = { foo_id: 123 } // Save ID to session
+scene.do(async (ctx) => {
+  ctx.session = { foo_id: 123 } // Save ID to session
 })
 
 scene.wait().on("message", async (ctx) => {

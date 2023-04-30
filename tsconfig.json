@@ -1,8 +1,7 @@
 {
-	"extends": "@tsconfig/node18/tsconfig.json",
+	"extends": "@tsconfig/node14",
 	"include": ["src", "tests"],
 	"compilerOptions": {
-		"module": "ESNext",
 		"paths": {
 			"grammy-scenes": ["./src"],
 			"grammy-scenes/pseudo-update": ["./src/contrib/pseudo-update"]

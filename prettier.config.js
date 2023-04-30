@@ -3,7 +3,7 @@ module.exports = {
 	useTabs: true,
 	overrides: [
 		{
-			files: ["package.json", "*.md"],
+			files: "*.md",
 			options: {
 				useTabs: false,
 			},
