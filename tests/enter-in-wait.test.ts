@@ -54,7 +54,7 @@ scene1.step(async (ctx) => {
 	})
 })
 
-scene1.wait().on("callback_query:data", async (ctx) => {
+scene1.wait("button").on("callback_query:data", async (ctx) => {
 	await ctx.answerCallbackQuery()
 	if (ctx.callbackQuery.data === "scenes_enter") {
 		await ctx.scenes.enter("scene2")
@@ -70,7 +70,7 @@ scene1.step((ctx) => ctx.reply(`Scene 1 complete`))
 const scene2 = new Scene<BotContext>("scene2")
 
 scene2.step((ctx) => ctx.reply(`Scene 2, enter your name:`))
-scene2.wait().on("message:text", async (ctx) => {
+scene2.wait("name").on("message:text", async (ctx) => {
 	await ctx.reply(
 		`Hello, ${ctx.message.text}. This is the end, you should not see Scene 1.`
 	)

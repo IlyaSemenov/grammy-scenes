@@ -28,7 +28,7 @@ scene.step(async (ctx) => {
 	)
 })
 
-scene.wait().on("message", async (ctx) => {
+scene.wait("something").on("message", async (ctx) => {
 	await ctx.reply(`Context correct: ${ctx.foo === important_value}`)
 	ctx.scene.resume()
 })

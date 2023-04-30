@@ -12,6 +12,7 @@ export class Scene<
 	_always?: Composer2<SceneFlavoredContext<C, S>>
 	_steps: Array<StepComposer<SceneFlavoredContext<C, S>, S>> = []
 	_pos_by_label: SafeDictionary<number> = {}
+	_label_by_pos: string[] = []
 
 	constructor(public readonly id: string) {}
 
@@ -34,10 +35,17 @@ export class Scene<
 	 * Mark a named position in scene to be used by scene.goto()
 	 */
 	label(label: string) {
-		if (label in this._pos_by_label) {
+		const pos = this._steps.length
+		if (this._pos_by_label[label] !== undefined) {
 			throw new Error(`Scene ${this.id} already has step ${label}.`)
 		}
-		this._pos_by_label[label] = this._steps.length
+		if (this._label_by_pos[pos] !== undefined) {
+			throw new Error(
+				`Scene ${this.id} adding duplicate label ${label} for the same step.`
+			)
+		}
+		this._pos_by_label[label] = pos
+		this._label_by_pos[pos] = label
 		return this
 	}
 
@@ -47,7 +55,7 @@ export class Scene<
 	 *
 	 * @example
 	 * ```ts
-	 * scene.wait().on("message:text", async (ctx) => {
+	 * scene.wait("name").on("message:text", async (ctx) => {
 	 *   await ctx.reply("...")
 	 *   if (...) {
 	 *     ctx.scene.resume()
@@ -55,10 +63,13 @@ export class Scene<
 	 * })
 	 * ```
 	 */
-	wait() {
+	wait(label: string) {
 		this.step((ctx) => {
 			ctx.scene._wait()
 		})
+		if (label) {
+			this.label(label)
+		}
 		return this.step().do((ctx) => {
 			ctx.scene._must_resume()
 		})

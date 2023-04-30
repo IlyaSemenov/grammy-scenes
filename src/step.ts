@@ -31,9 +31,6 @@ export class StepComposer<
 
 	/** Register middleware for ctx.scenes.notify() calls. */
 	onNotify(...middleware: Array<MiddlewareFn<SceneFlavoredContext<C, S>>>) {
-		return this.filter(
-			(ctx) => ctx.scene?.opts?._notify === true,
-			...middleware
-		)
+		return this.filter((ctx) => ctx.scene?._notify === true, ...middleware)
 	}
 }

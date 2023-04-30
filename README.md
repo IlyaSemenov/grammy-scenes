@@ -93,15 +93,15 @@ mainScene.step(async (ctx) => {
 // Next Telegram updates will be passed to the inner middleware.
 // The inner middleware should call ctx.scene.resume() to proceed to the next scene step.
 // Make sure to use unique name in each wait() block.
-mainScene.wait().on("message:text", async (ctx) => {
+mainScene.wait("name").on("message:text", async (ctx) => {
   const name = ctx.message.text
   if (name.toLowerCase() === "john") {
     await ctx.reply(`Welcome, ${name}!`)
     // Proceed to the next step.
     ctx.scene.resume()
   } else {
-    // Keep the execution in the current wait() block.
     await ctx.reply(`${name}, your are not welcome here.`)
+    // Keep the execution in the current wait() block.
   }
 })
 
@@ -117,7 +117,8 @@ mainScene.label("start")
 // See sample captcha implementation below.
 mainScene.call("captcha")
 
-mainScene.step(async (ctx) => {
+// Please add step label for the first step after call()
+mainScene.label("after_captcha").step(async (ctx) => {
   await ctx.reply(`Please choose:`, {
     reply_markup: {
       inline_keyboard: [
@@ -131,7 +132,7 @@ mainScene.step(async (ctx) => {
   })
 })
 
-mainScene.wait().on("callback_query:data", async (ctx) => {
+mainScene.wait("menu").on("callback_query:data", async (ctx) => {
   await ctx.answerCallbackQuery()
   const choice = ctx.callbackQuery.data
   if (choice === "start") {
@@ -206,7 +207,7 @@ captchaScene.step(async (ctx) => {
   await ctx.reply(`Enter the letters you see below:`)
   await ctx.replyWithPhoto(image)
 })
-captchaScene.wait().setup((scene) => {
+captchaScene.wait("letters").setup((scene) => {
   // `setup` is a helper which simply runs the setup function against the current composer.
   // See https://github.com/grammyjs/grammY/issues/163
   scene.on("message:text", async (ctx) => {
@@ -238,7 +239,7 @@ jobScene.step(async (ctx) => {
   const token = ctx.scene.createNotifyToken()
   startJob({ chat_id: ctx.chat!.id, token })
 })
-jobScene.wait().setup((scene) => {
+jobScene.wait("job").setup((scene) => {
   // Register middleware for future ctx.scenes.notify() call.
   scene.onNotify(async (ctx) => {
     await ctx.reply(`Job completed with result: ${ctx.scene.arg}`)
@@ -342,7 +343,7 @@ scene.step((ctx) => {
   ctx.scene.session = { foo_id: 123 } // Save ID to session
 })
 
-scene.wait().on("message", async (ctx) => {
+scene.wait("message").on("message", async (ctx) => {
   await ctx.reply(`ctx.foo: ${ctx.foo.name}`)
 })
 ```

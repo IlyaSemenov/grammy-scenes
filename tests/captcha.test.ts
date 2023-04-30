@@ -61,7 +61,7 @@ captcha_scene.step(async (ctx) => {
 	ctx.scene.session = { secret }
 	await ctx.reply(`Enter the letters you see below: (${secret})`)
 })
-captcha_scene.wait().setup((scene) => {
+captcha_scene.wait("letters").setup((scene) => {
 	scene.on("message:text", async (ctx) => {
 		if (ctx.message.text === ctx.scene.session.secret) {
 			ctx.scene.resume()
@@ -91,7 +91,7 @@ main_scene.step(async (ctx) => {
 		ctx.scene.call("captcha")
 	}
 })
-main_scene.step(async (ctx) => {
+main_scene.label("after_random").step(async (ctx) => {
 	await ctx.reply(`Do you want to try your luck once again?`, {
 		reply_markup: {
 			inline_keyboard: [
@@ -103,7 +103,7 @@ main_scene.step(async (ctx) => {
 		},
 	})
 })
-main_scene.wait().on("callback_query:data", async (ctx) => {
+main_scene.wait("again").on("callback_query:data", async (ctx) => {
 	await ctx.answerCallbackQuery()
 	if (ctx.callbackQuery.data === "yes") {
 		ctx.scene.goto("captcha")

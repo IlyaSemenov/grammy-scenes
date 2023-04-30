@@ -1,26 +1,25 @@
 import * as uuid from "uuid"
 
-import { SceneRunOpts, ScenesFlavoredContext, SceneStackFrame } from "."
+import { ScenesFlavoredContext } from "."
 
 /** injected as ctx.scene */
 export class SceneManager<S = unknown> {
-	constructor(
-		public readonly frame: SceneStackFrame,
-		public readonly opts?: SceneRunOpts
-	) {}
+	session: S
+	readonly arg?: any
+	readonly _notify?: boolean
 
-	/** Return session data that is local to this scene. The data will be discarded once scene completes, and persisted during nested scene calls. */
-	get session() {
-		return this.frame.context as S
-	}
-
-	set session(value: S) {
-		this.frame.context = value
-	}
-
-	/** Return optional payload passed to enter(), call(), goto(), notify(), set by arg() or next_arg */
-	get arg() {
-		return this.opts?.arg
+	constructor({
+		session,
+		arg,
+		_notify,
+	}: {
+		session: S
+		arg?: any
+		_notify?: boolean
+	}) {
+		this.session = session as S
+		this.arg = arg
+		this._notify = _notify
 	}
 
 	/** Payload for ctx.scene.arg in next step */
@@ -74,10 +73,9 @@ export class SceneManager<S = unknown> {
 
 	/** Return a token that can be used later for ctx.scenes.notify() */
 	createNotifyToken() {
-		const token = uuid.v4()
-		this.frame.token = token
-		return token
+		return (this._notify_token = uuid.v4())
 	}
+	_notify_token?: string
 }
 
 export type SceneFlavoredContext<C extends ScenesFlavoredContext, S> = C & {

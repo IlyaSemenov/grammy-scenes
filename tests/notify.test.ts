@@ -41,7 +41,7 @@ scene.step(async (ctx) => {
 	}, 500)
 })
 
-scene.wait().setup((scene) => {
+scene.wait("job").setup((scene) => {
 	scene.onNotify(async (ctx) => {
 		await ctx.reply(`Job finished: ${ctx.scene.arg}`)
 		ctx.scene.resume()
@@ -53,7 +53,7 @@ scene.wait().setup((scene) => {
 
 scene.step((ctx) => ctx.reply("Enter your name"))
 
-scene.wait().setup((scene) => {
+scene.wait("name").setup((scene) => {
 	scene.onNotify(async (ctx) => {
 		// This wait() is not supposed to be notified by the old token.
 		await ctx.reply(`This should never happen!`)

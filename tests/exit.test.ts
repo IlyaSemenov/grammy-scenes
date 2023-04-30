@@ -35,7 +35,7 @@ scene.step(async (ctx) => {
 	})
 })
 
-scene.wait().on("callback_query:data", async (ctx) => {
+scene.wait("proceed_or_exit").on("callback_query:data", async (ctx) => {
 	await ctx.answerCallbackQuery()
 	if (ctx.callbackQuery.data === "proceed") {
 		ctx.scene.resume()

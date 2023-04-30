@@ -5,13 +5,17 @@ import { ScenesManager } from "."
 /** Flavor to grammy session */
 export interface ScenesSessionFlavor {
 	scenes?: {
+		/** Execution stack (inner to outer) */
 		stack: SceneStackFrame[]
 	}
 }
 
+/** Scene execution stack frame (stored in session) */
 export interface SceneStackFrame {
 	scene: string
-	pos: number
+	/** Should not be stored to session. */
+	pos?: number
+	step?: string
 	context?: any
 	token?: string
 }

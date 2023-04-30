@@ -1,3 +1,4 @@
+import Debug from "debug"
 import { Composer } from "grammy"
 import { assert, SafeDictionary } from "ts-essentials"
 
@@ -8,6 +9,8 @@ import {
 	ScenesFlavoredContext,
 	SceneStackFrame,
 } from "."
+
+const debug = Debug("grammy-scenes")
 
 /** injected as ctx.scenes */
 export class ScenesManager<
@@ -40,94 +43,154 @@ export class ScenesManager<
 	}
 
 	async _run_stack(stack: SceneStackFrame[], opts?: SceneRunOpts) {
-		// By default, delete the stack from the session.
+		// Delete the stack from the session.
 		// Re-save it explicitly if ctx.scene._wait() was called.
 		this.ctx.session.scenes = undefined
 
 		while (stack[0]) {
-			const frame = stack[0]
+			const frame = stack.shift()!
 			const scene = this.scenes[frame.scene]
 			if (!scene) {
 				// Invalid session data - abort.
 				return
 			}
-			const step = scene._steps[frame.pos]
-			// TODO: distinguish case where missing step is caused by invalid session data vs. normal scene finish.
-			if (step) {
+
+			const debug_scene = debug.extend(`scene=${scene.id}`)
+
+			const frame_pos =
+				frame.pos ?? (frame.step ? scene._pos_by_label[frame.step] : undefined)
+			if (frame_pos === undefined) {
+				// Invalid session data - abort.
+				return
+			}
+			let pos = frame_pos
+			let is_first_step = true
+			let session = frame.context
+			let notify_token = frame.token
+
+			while (true) {
+				const debug_step = debug_scene.extend(`pos=${pos}`)
+				debug_step("")
+
+				const step = scene._steps[pos]
+				if (!step) {
+					break
+				}
 				const composer = new Composer<SceneFlavoredContext<C, any>>()
-				if (scene._always) {
-					// TODO: don't run _always middleware for the next step of the same scene
+				if (is_first_step && scene._always) {
 					composer.use(scene._always)
 				}
 				composer.use(step)
 				const step_mw = composer.middleware()
-				const inner_ctx = this.ctx as any
-				const scene_manager = new SceneManager(frame, opts)
+
+				const scene_manager = new SceneManager({
+					session,
+					arg: opts?.arg,
+					_notify: opts?._notify,
+				})
 				opts = undefined
+
+				const inner_ctx = this.ctx as any
 				inner_ctx.scene = scene_manager
 				try {
 					await step_mw(inner_ctx, async () => undefined)
 				} finally {
 					delete inner_ctx.scene
 				}
+				session = scene_manager.session
+				if (scene_manager._notify_token) {
+					notify_token = scene_manager._notify_token
+				}
+
+				const get_stack_frame = (): SceneStackFrame => {
+					const label = scene._label_by_pos[pos]
+					return {
+						scene: scene.id,
+						pos: label === undefined ? pos : undefined,
+						step: label,
+						context: session,
+						token: notify_token,
+					}
+				}
+
+				const save_stack = () => {
+					const full_stack = [get_stack_frame(), ...stack]
+					for (const frame of full_stack) {
+						if (frame.pos !== undefined) {
+							console.warn(
+								`Saving scenes stack with unnamed steps is discouraged! Please add .label() for step ${frame.pos} in scene ${frame.scene}.`
+							)
+						}
+					}
+					if (this.ctx.session.scenes) {
+						console.warn(
+							"Scenes stack has already been saved, probably by calling await ctx.scenes.enter(). Please use ctx.scene.enter() instead."
+						)
+					}
+					this.ctx.session.scenes ??= { stack: full_stack }
+				}
+
 				if (scene_manager._want_enter) {
 					// Replace stack with new scene.
 					const { scene_id, arg } = scene_manager._want_enter
+					debug_step(`enter scene ${scene_id}`)
 					stack = [{ scene: scene_id, pos: 0 }]
 					opts = { arg }
-					continue
+					break
 				} else if (scene_manager._want_exit) {
 					// Exit current scene.
+					debug_step(`exit scene`)
 					const { arg } = scene_manager._want_exit
 					opts = { arg }
-					// Do nothing - this will shift stack and continue to outer scene.
+					break
 				} else if (scene_manager._want_goto) {
-					// Goto step inside current scene
+					// Goto step inside current scene.
 					const { label, arg } = scene_manager._want_goto
-					const pos = scene._pos_by_label[label]
+					debug_step(`goto step ${label}`)
+					const new_pos = scene._pos_by_label[label]
 					assert(
-						pos !== undefined,
+						new_pos !== undefined,
 						`Scene ${scene.id} doesn't have label ${label}.`
 					)
-					frame.pos = pos
+					pos = new_pos
 					opts = { arg }
+					is_first_step = false
 					continue
 				} else if (scene_manager._want_call) {
-					// FIXME: need to save named position here.
+					// Call inner scene.
 					const { scene_id, arg } = scene_manager._want_call
-					frame.pos++
-					stack.unshift({ scene: scene_id, pos: 0 })
+					debug_step(`call scene ${scene_id}`)
+					pos++
+					stack.unshift({ scene: scene_id, pos: 0 }, get_stack_frame())
 					opts = { arg }
-					continue
-				} else if (scene_manager._want_must_resume) {
-					if (scene_manager._want_resume) {
-						delete frame.token
-						frame.pos++
-						continue
-					} else {
-						// ctx.scene.resume() was not called - save session and abort.
-						// FIXME: need to save named position here.
-						this.ctx.session.scenes ??= { stack }
-						return
-					}
+					break
 				} else if (scene_manager._want_wait) {
-					// FIXME: need to save named position here.
-					frame.pos++
-					this.ctx.session.scenes ??= { stack }
+					// wait() called - exit and save next step.
+					debug_step(`wait`)
+					pos++
+					save_stack()
 					return
-				} else {
-					// Nothing interesting happened. Proceed to next step.
-					frame.pos++
-					opts = { arg: scene_manager.next_arg }
-					continue
+				} else if (scene_manager._want_must_resume) {
+					// Inside wait() handler.
+					if (!scene_manager._want_resume) {
+						// resume() not called - exit and save current step.
+						debug_step(`still wait`)
+						save_stack()
+						return
+					} else {
+						// Invalidate notify token. It's supposed to only work for the nearest wait/notify/resume.
+						notify_token = undefined
+					}
 				}
+				pos++
+				opts = { arg: scene_manager.next_arg }
+				is_first_step = false
 			}
-			stack.shift()
 		}
 	}
 }
 
 export interface SceneRunOpts {
-	arg?: any
-	_notify?: boolean
+	readonly arg?: any
+	readonly _notify?: boolean
 }

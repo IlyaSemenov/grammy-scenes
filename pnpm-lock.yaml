@@ -4,10 +4,12 @@ specifiers:
   '@commitlint/cli': ~17.6.1
   '@commitlint/config-conventional': ~17.6.1
   '@tsconfig/node18': ~2.0.0
+  '@types/debug': ~4.1.7
   '@types/node': ~18.16.3
   '@types/uuid': ~9.0.1
   '@typescript-eslint/eslint-plugin': ~5.59.1
   '@typescript-eslint/parser': ~5.59.1
+  debug: ^4
   eslint: ~8.39.0
   eslint-config-prettier: ~8.8.0
   eslint-plugin-prettier: ~4.2.1
@@ -26,6 +28,7 @@ specifiers:
   vite-tsconfig-paths: ~4.2.0
 
 dependencies:
+  debug: 4.3.4
   ts-essentials: 9.3.1_typescript@5.0.4
   uuid: 9.0.0
 
@@ -33,6 +36,7 @@ devDependencies:
   '@commitlint/cli': 17.6.1
   '@commitlint/config-conventional': 17.6.1
   '@tsconfig/node18': 2.0.0
+  '@types/debug': 4.1.7
   '@types/node': 18.16.3
   '@types/uuid': 9.0.1
   '@typescript-eslint/eslint-plugin': 5.59.1_2utyh6gct5glvuz6qwradubqqa
@@ -591,12 +595,22 @@ packages:
     resolution: {integrity: sha512-uI/B0ShkiEwTk036pncXucVlj4y11EW6mycQvCEzC1PkR2TBvdQZ5Wf96dp+XXWAc70FEDfvwTqanoaDpP6rPw==}
     dev: true
 
+  /@types/debug/4.1.7:
+    resolution: {integrity: sha512-9AonUzyTjXXhEOa0DnqpzZi6VHlqKMswga9EXjpXnnqxwLtdvPPtlO8evrI5D9S6asFRCQ6v+wpiUKbw+vKqyg==}
+    dependencies:
+      '@types/ms': 0.7.31
+    dev: true
+
   /@types/json-schema/7.0.9:
     resolution: {integrity: sha512-qcUXuemtEu+E5wZSJHNxUXeCZhAfXKQ41D+duX+VYPde7xyEVZci+/oXKJL13tnRs9lR2pr4fod59GT6/X1/yQ==}
     dev: true
 
   /@types/minimist/1.2.2:
     resolution: {integrity: sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==}
+    dev: true
+
+  /@types/ms/0.7.31:
+    resolution: {integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==}
     dev: true
 
   /@types/node/18.16.3:
@@ -1140,7 +1154,6 @@ packages:
         optional: true
     dependencies:
       ms: 2.1.2
-    dev: true
 
   /decamelize-keys/1.1.1:
     resolution: {integrity: sha512-WiPxgEirIV0/eIOMcnFBA3/IJZAZqKnwAwWyvvdi4lsr1WCN22nhdf/3db3DoZcUjTV2SqfzIwNyp6y2xs3nmg==}
@@ -2103,7 +2116,6 @@ packages:
 
   /ms/2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
-    dev: true
 
   /mz/2.7.0:
     resolution: {integrity: sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==}
