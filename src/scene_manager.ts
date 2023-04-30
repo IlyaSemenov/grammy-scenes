@@ -1,4 +1,4 @@
-import { v4 as uuid_v4 } from "uuid"
+import * as uuid from "uuid"
 
 import { SceneRunOpts, ScenesFlavoredContext, SceneStackFrame } from "."
 
@@ -18,7 +18,7 @@ export class SceneManager<S = unknown> {
 		this.frame.context = value
 	}
 
-	/** Return optional payload passed to enter(), call(), resume(), goto(), set by arg() or next_arg */
+	/** Return optional payload passed to enter(), call(), goto(), notify(), set by arg() or next_arg */
 	get arg() {
 		return this.opts?.arg
 	}
@@ -72,9 +72,9 @@ export class SceneManager<S = unknown> {
 	}
 	_want_enter?: { scene_id: string; arg?: any }
 
-	/** Return a token that can be used later for ctx.scenes.resume() */
-	createResumeToken() {
-		const token = uuid_v4()
+	/** Return a token that can be used later for ctx.scenes.notify() */
+	createNotifyToken() {
+		const token = uuid.v4()
 		this.frame.token = token
 		return token
 	}

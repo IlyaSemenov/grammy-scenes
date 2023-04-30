@@ -26,7 +26,7 @@ import { BotContext, create_bot } from "./lib/bot"
 
 interface Job {
 	chat_id: number
-	resume_token: string
+	token: string
 }
 
 const jobs: Job[] = []
@@ -34,15 +34,15 @@ const jobs: Job[] = []
 const scene = new Scene<BotContext>("main")
 
 scene.do(async (ctx) => {
-	const resume_token = ctx.scene.createResumeToken()
+	const token = ctx.scene.createNotifyToken()
 	await ctx.reply(`Starting job...`)
 	setTimeout(() => {
-		jobs.push({ chat_id: ctx.chat!.id, resume_token })
+		jobs.push({ chat_id: ctx.chat!.id, token })
 	}, 500)
 })
 
 scene.wait().setup((scene) => {
-	scene.resume(async (ctx) => {
+	scene.onNotify(async (ctx) => {
 		await ctx.reply(`Job finished: ${ctx.scene.arg}`)
 		ctx.scene.resume()
 	})
@@ -54,8 +54,8 @@ scene.wait().setup((scene) => {
 scene.do((ctx) => ctx.reply("Enter your name"))
 
 scene.wait().setup((scene) => {
-	scene.resume(async (ctx) => {
-		// This wait is not supposed to be resumed by the old token.
+	scene.onNotify(async (ctx) => {
+		// This wait() is not supposed to be notified by the old token.
 		await ctx.reply(`This should never happen!`)
 	})
 	scene.on("message:text", async (ctx) => {
@@ -71,10 +71,10 @@ create_bot([scene], (bot) => {
 		const job = jobs.shift()
 		if (job) {
 			bot.handlePseudoUpdate({ chat_id: job.chat_id }, async (ctx) => {
-				await ctx.scenes.resume(job.resume_token, "All OK")
+				await ctx.scenes.notify(job.token, "All OK")
 			})
-			// Ouch! We left a bug in the code which leads to duplicate resumes.
-			// Let's see if it causes invalid bot resumes (it shouldn't, as the resume token is supposed to be invalidated).
+			// Ouch! We left a bug in the code which leads to duplicate notify calls.
+			// Let's see if it causes invalid bot resumes (it shouldn't, as the notify token is supposed to be invalidated).
 			jobs.push(job)
 		}
 	}, 1000)

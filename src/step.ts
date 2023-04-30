@@ -29,8 +29,11 @@ export class StepComposer<
 		this.use((ctx) => ctx.scene.goto(label, arg))
 	}
 
-	/** Register middleware for ctx.scenes.resume() calls. */
-	resume(...middleware: Array<MiddlewareFn<SceneFlavoredContext<C, S>>>) {
-		return this.filter((ctx) => ctx.scene?.opts?.resume === true, ...middleware)
+	/** Register middleware for ctx.scenes.notify() calls. */
+	onNotify(...middleware: Array<MiddlewareFn<SceneFlavoredContext<C, S>>>) {
+		return this.filter(
+			(ctx) => ctx.scene?.opts?._notify === true,
+			...middleware
+		)
 	}
 }

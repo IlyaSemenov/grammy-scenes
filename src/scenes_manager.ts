@@ -31,11 +31,11 @@ export class ScenesManager<
 		this.ctx.session.scenes = undefined
 	}
 
-	/** Resume scene if it's still on the same step */
-	async resume(token: string, arg?: unknown) {
+	/** Notify waiting scene */
+	async notify(token: string, arg?: any) {
 		const stack = this.ctx.session.scenes?.stack
 		if (stack && token && stack[0]?.token === token) {
-			await this._run_stack(stack, { arg, resume: true })
+			await this._run_stack(stack, { arg, _notify: true })
 		}
 	}
 
@@ -137,5 +137,5 @@ export class ScenesManager<
 
 export interface SceneRunOpts {
 	arg?: any
-	resume?: boolean
+	_notify?: boolean
 }

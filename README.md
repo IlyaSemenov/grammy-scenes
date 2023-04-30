@@ -178,7 +178,7 @@ The following API methods allow passing argument:
 - `scene.exit`
 - `scene.arg`
 - `ctx.scenes.enter`
-- `ctx.scenes.resume`
+- `ctx.scenes.notify`
 - `ctx.scene.call`
 - `ctx.scene.exit`
 - `ctx.scene.goto`
@@ -189,7 +189,7 @@ You may also explicitly set argument for the next step with:
 ctx.scene.next_arg = ...
 ```
 
-Note that this value is transient. It is not saved to the session, and thus does not survive wait/resume cycle. Please use `ctx.scene.session` if you need that.
+Note that this value is transient. It is not saved to the session, and thus does not survive wait/notify cycle. Please use `ctx.scene.session` if you need that.
 
 ### Scene session context
 
@@ -238,12 +238,12 @@ import { BotContext } from "../bot"
 const jobScene = new Scene<BotContext>("job")
 jobScene.do(async (ctx) => {
   await ctx.reply(`Starting job...`)
-  const resume_token = ctx.scene.createResumeToken()
-  startJob({ chat_id: ctx.chat!.id, resume_token })
+  const token = ctx.scene.createNotifyToken()
+  startJob({ chat_id: ctx.chat!.id, token })
 })
 jobScene.wait().setup((scene) => {
-  // Register middleware for future ctx.scenes.resume() call.
-  scene.resume(async (ctx) => {
+  // Register middleware for future ctx.scenes.notify() call.
+  scene.onNotify(async (ctx) => {
     await ctx.reply(`Job completed with result: ${ctx.scene.arg}`)
     ctx.scene.resume()
   })
@@ -253,13 +253,13 @@ jobScene.wait().setup((scene) => {
 })
 ```
 
-To resume the scene, call `ctx.scenes.resume()` when the job completes:
+To resume the scene, call `ctx.scenes.notify()` when the job completes:
 
 ```ts
-onJobComplete(async ({ resumeToken, jobResult }) => {
-  await ctx.scenes.resume(resumeToken)
+onJobComplete(async ({ token, jobResult }) => {
+  await ctx.scenes.notify(token)
   // or:
-  await ctx.scenes.resume(resumeToken, jobResult)
+  await ctx.scenes.notify(token, jobResult)
 })
 ```
 
@@ -286,10 +286,10 @@ bot.use(scenes)
 
 // ...
 
-onSomeExternalEvent(({ chat_id, resume_token, payload }) => {
+onSomeExternalEvent(({ chat_id, token, payload }) => {
   bot.handlePseudoUpdate({ chat_id }, async (ctx) => {
     // This code will be executed by the executor installed above.
-    await ctx.scenes.resume(resume_token, payload)
+    await ctx.scenes.notify(token, payload)
   })
 })
 
