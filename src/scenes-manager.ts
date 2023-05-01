@@ -31,12 +31,14 @@ export class ScenesManager<
 
 	/** Abort scenes execution */
 	async abort() {
-		this.ctx.session.scenes = undefined
+		const session = await this.ctx.session
+		session.scenes = undefined
 	}
 
 	/** Notify waiting scene */
 	async notify(token: string, arg?: any) {
-		const stack = this.ctx.session.scenes?.stack
+		const session = await this.ctx.session
+		const stack = session.scenes?.stack
 		if (stack && token && stack[0]?.token === token) {
 			await this._run_stack(stack, { arg, _notify: true })
 		}
@@ -45,7 +47,8 @@ export class ScenesManager<
 	async _run_stack(stack: SceneStackFrame[], opts?: SceneRunOpts) {
 		// Delete the stack from the session.
 		// Re-save it explicitly if ctx.scene._wait() was called.
-		this.ctx.session.scenes = undefined
+		const session = await this.ctx.session
+		session.scenes = undefined
 
 		while (stack[0]) {
 			const frame = stack.shift()!
@@ -65,7 +68,7 @@ export class ScenesManager<
 			}
 			let pos = frame_pos
 			let is_first_step = true
-			let session = frame.context
+			let scene_session = frame.context
 			let notify_token = frame.token
 
 			while (true) {
@@ -84,7 +87,7 @@ export class ScenesManager<
 				const step_mw = composer.middleware()
 
 				const scene_manager = new SceneManager({
-					session,
+					session: scene_session,
 					arg: opts?.arg,
 					_notify: opts?._notify,
 				})
@@ -97,7 +100,7 @@ export class ScenesManager<
 				} finally {
 					delete inner_ctx.scene
 				}
-				session = scene_manager.session
+				scene_session = scene_manager.session
 				if (scene_manager._notify_token) {
 					notify_token = scene_manager._notify_token
 				}
@@ -108,7 +111,7 @@ export class ScenesManager<
 						scene: scene.id,
 						pos: label === undefined ? pos : undefined,
 						step: label,
-						context: session,
+						context: scene_session,
 						token: notify_token,
 					}
 				}
@@ -122,12 +125,12 @@ export class ScenesManager<
 							)
 						}
 					}
-					if (this.ctx.session.scenes) {
+					if (session.scenes) {
 						console.warn(
 							"Scenes stack has already been saved, probably by calling await ctx.scenes.enter(). Please use ctx.scene.enter() instead."
 						)
 					}
-					this.ctx.session.scenes ??= { stack: full_stack }
+					session.scenes ??= { stack: full_stack }
 				}
 
 				if (scene_manager._want_enter) {

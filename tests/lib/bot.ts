@@ -1,15 +1,15 @@
-import { Bot, Context, session, SessionFlavor } from "grammy"
+import { Bot, Context, lazySession, LazySessionFlavor } from "grammy"
 import { pseudoUpdate } from "grammy-pseudo-update"
 import {
 	Scene,
 	ScenesComposer,
-	ScenesFlavoredContext,
-	ScenesSessionFlavor,
+	ScenesFlavor,
+	ScenesSessionData,
 } from "grammy-scenes"
 
 export type BotContext = Context &
-	SessionFlavor<ScenesSessionFlavor> &
-	ScenesFlavoredContext
+	LazySessionFlavor<ScenesSessionData> &
+	ScenesFlavor
 
 export async function create_bot<C extends BotContext>(
 	scenes: Scene<C, any>[],
@@ -21,10 +21,13 @@ export async function create_bot<C extends BotContext>(
 	const is_manual_run = !!token
 	const bot = new Bot<C>(token || "invalid")
 	bot.use(
-		session({
-			type: "multi",
-			scenes: {},
+		lazySession({
+			initial: () => ({}),
 		})
+		// session({
+		// 	type: "multi",
+		// 	scenes: {},
+		// })
 	)
 	if (is_manual_run) {
 		bot.use(async (ctx, next) => {

@@ -12,11 +12,11 @@ npm i grammy-scenes
 
 ```ts
 import { Bot, Context, session, SessionFlavor } from "grammy"
-import { ScenesSessionFlavor, ScenesFlavor } from "grammy-scenes"
+import { ScenesSessionData, ScenesFlavor } from "grammy-scenes"
 
 import { scenes } from "./scenes"
 
-type SessionData = ScenesSessionFlavor & {
+type SessionData = ScenesSessionData & {
   // Your own global session interface, could be empty as well.
 }
 

@@ -33,7 +33,8 @@ export class ScenesComposer<C extends ScenesFlavoredContext>
 
 	middleware() {
 		const mw: MiddlewareFn<C> = async (ctx, next) => {
-			const stack = ctx.session.scenes?.stack
+			const session = await ctx.session
+			const stack = session.scenes?.stack
 			if (stack) {
 				await ctx.scenes._run_stack(stack)
 			} else {
