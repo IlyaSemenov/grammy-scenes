@@ -348,7 +348,7 @@ scene.wait("message").on("message", async (ctx) => {
 })
 ```
 
-## Lazy (dynamic) scene manager
+### Lazy (dynamic) scene manager
 
 You can use different scenes based on context (e.g. for different users, or populated in runtime from the database).
 
