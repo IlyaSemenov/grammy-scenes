@@ -25,7 +25,7 @@ export class ScenesComposer<C extends ScenesFlavoredContext>
 	manager(): MiddlewareFn<C> {
 		const mw: MiddlewareFn<C> = (ctx, next) => {
 			const writable_ctx = ctx as any
-			writable_ctx.scenes = new ScenesManager<C>(ctx, this.scenes)
+			writable_ctx.scenes = new ScenesManager<C>(ctx, this)
 			return next()
 		}
 		return mw

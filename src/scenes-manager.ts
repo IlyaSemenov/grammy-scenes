@@ -1,11 +1,11 @@
 import Debug from "debug"
 import { Composer } from "grammy"
-import { assert, SafeDictionary } from "ts-essentials"
+import { assert } from "ts-essentials"
 
 import {
-	Scene,
 	SceneFlavoredContext,
 	SceneManager,
+	ScenesComposer,
 	ScenesFlavoredContext,
 	SceneStackFrame,
 } from "."
@@ -19,12 +19,17 @@ export class ScenesManager<
 > {
 	constructor(
 		public readonly ctx: C,
-		public readonly scenes: SafeDictionary<Scene<C, any>>
+		public readonly composer: ScenesComposer<C>
 	) {}
+
+	// Compatibility API
+	get scenes() {
+		return this.composer.scenes
+	}
 
 	/** Enter top-level scene */
 	async enter(sceneId: string, arg?: unknown) {
-		const scene = this.scenes[sceneId]
+		const scene = this.composer.scenes[sceneId]
 		assert(scene, `Scene ${sceneId} not found.`)
 		await this._run_stack([{ scene: sceneId, pos: 0 }], { arg })
 	}
@@ -52,7 +57,7 @@ export class ScenesManager<
 
 		while (stack[0]) {
 			const frame = stack.shift()!
-			const scene = this.scenes[frame.scene]
+			const scene = this.composer.scenes[frame.scene]
 			if (!scene) {
 				// Invalid session data - abort.
 				return

@@ -347,3 +347,26 @@ scene.wait("message").on("message", async (ctx) => {
   await ctx.reply(`ctx.foo: ${ctx.foo.name}`)
 })
 ```
+
+## Lazy (dynamic) scene manager
+
+You can use different scenes based on context (e.g. for different users, or populated in runtime from the database).
+
+```ts
+// Inject ctx.scenes
+bot.lazy((ctx) => {
+  const scenes = new ScenesComposer<BotContext>()
+  // Populate scenes in runtime with scenes.scene(...)
+  return scenes.manager()
+})
+
+bot.command("start", async (ctx) => {
+  // Assuming you will always have the main scene:
+  await ctx.scenes.enter("main")
+})
+
+// Actually run scenes
+bot.lazy((ctx) => ctx.scenes.composer)
+
+bot.start()
+```
