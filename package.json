@@ -20,10 +20,6 @@
     "dist",
     "src"
   ],
-  "engines": {
-    "node": "20",
-    "pnpm": "9"
-  },
   "scripts": {
     "build": "tsup",
     "prepack": "npm run build",
